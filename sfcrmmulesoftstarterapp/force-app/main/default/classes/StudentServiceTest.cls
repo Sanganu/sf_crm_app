@@ -5,7 +5,8 @@ private class StudentServiceTest {
     static void testGetStudents() {
 
         Student__c s = new Student__c(
-            Name = 'John Doe',
+            Name__c='Sita',
+            Last_Name__c='Ram',
             Email__c = 'john@test.com',
             GPA__c = 8,
             Status__c = 'Active'
@@ -26,7 +27,9 @@ private class StudentServiceTest {
     static void testValidation() {
 
         Student__c s = new Student__c(
-            Name = 'Bad Student',
+            Name__c='Ram',
+            Last_Name__c='  Dasarathan',
+            Email__c='badData@test.com',
             GPA__c = 20
         );
 
