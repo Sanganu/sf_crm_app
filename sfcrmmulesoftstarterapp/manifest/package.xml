@@ -10,5 +10,9 @@
     <members>University_CRM</members>
     <name>CustomApplication</name>
   </types>
+  <types>
+        <members>*</members>
+        <name>ApexClass</name>
+    </types>
   <version>66.0</version>
 </Package>

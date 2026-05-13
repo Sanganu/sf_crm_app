@@ -4,4 +4,4 @@ sf org login web --alias DevOrg
 sf project deploy start
 sf project deploy start --source-dir force-app/main/default/classes
 sf apex run test --test-level RunLocalTests
- 
+sf project retrieve start

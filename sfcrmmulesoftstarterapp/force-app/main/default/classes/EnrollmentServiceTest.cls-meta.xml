@@ -1,0 +1,59 @@
+@isTest
+private class EnrollmentServiceTest {
+
+    @isTest
+    static void testEnrollment() {
+
+        Student__c s = new Student__c(
+            Name = 'John',
+            Email__c = 'john@test.com',
+            GPA__c = 8,
+            Status__c = 'Active'
+        );
+
+        insert s;
+
+        Course__c c = new Course__c(
+            Name = 'Science',
+            Code__c = 'SCI101'
+        );
+
+        insert c;
+
+        Test.startTest();
+
+        EnrollmentService.enrollStudent(
+            s.Id,
+            c.Id
+        );
+
+        Test.stopTest();
+
+        List<Enrollment__c> result = [
+            SELECT Id
+            FROM Enrollment__c
+        ];
+
+        System.assertEquals(1, result.size());
+    }
+
+    @isTest
+    static void testValidation() {
+
+        try {
+
+            EnrollmentService.enrollStudent(
+                null,
+                null
+            );
+
+            System.assert(false);
+
+        } catch (Exception e) {
+
+            System.assert(
+                e.getMessage().contains('Student is required')
+            );
+        }
+    }
+}
