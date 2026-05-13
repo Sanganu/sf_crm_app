@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types>
+    <members>Student__c</members>
+    <members>Enrollment__c</members>
+    <members>Course__c</members>
+    <name>CustomObject</name>
+  </types>
+  <types>
+    <members>University_CRM</members>
+    <name>CustomApplication</name>
+  </types>
+  <version>66.0</version>
+</Package>
