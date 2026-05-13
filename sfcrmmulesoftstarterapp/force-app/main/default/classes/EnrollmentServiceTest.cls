@@ -1,12 +1,12 @@
-public with sharing class EnrollmentService {
+public with sharing class EnrollmentServiceTest {
 
     public static void validateEnrollment(Enrollment__c e) {
 
-        if (e.Student__c == null)) {
+        if (e.Student__c == null) {
             throw new IllegalArgumentException('Student is required');
         }
 
-        if (se.Course__c == null) {
+        if (e.Course__c == null) {
             throw new IllegalArgumentException('Course is required');
         }
     }
@@ -34,7 +34,7 @@ public with sharing class EnrollmentService {
             SELECT Id, 
             Student__c,
             Student__r.Name,
-            Student__r.Last_Name,
+            Student__r.Last_Name__C,
             Course__c,
             Course__r.Name,
             Status__c

@@ -155,10 +155,9 @@
     <externalSharingModel>Private</externalSharingModel>
     <label>Course</label>
     <nameField>
-        <displayFormat>C-{0000}</displayFormat>
         <label>Course Name</label>
         <trackHistory>false</trackHistory>
-        <type>AutoNumber</type>
+        <type>Text</type>
     </nameField>
     <pluralLabel>Courses</pluralLabel>
     <searchLayouts></searchLayouts>

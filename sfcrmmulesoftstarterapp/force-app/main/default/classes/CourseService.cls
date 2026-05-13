@@ -11,27 +11,10 @@ public with sharing class CourseService {
         }
     }
 
-    public static List<Course__c> getCourses() {
-
-        return [
-            SELECT Id, Name, Code__c
-            FROM Course__c
-        ];
-    }
-
     public static void createCourse(Course__c c) {
 
-        validateCourse(c);
+        validateCourse(c); // validation FIRST
 
-        try {
-
-            insert c;
-
-        } catch (DmlException ex) {
-
-            throw new AuraHandledException(
-                'Unable to create course'
-            );
-        }
+        insert c;
     }
 }
