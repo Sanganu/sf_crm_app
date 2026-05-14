@@ -1,44 +1,39 @@
-public with sharing class EnrollmentServiceTest {
+@isTest
+private class EnrollmentServiceTest {
 
-    public static void validateEnrollment(Enrollment__c e) {
+    @isTest
+    static void testEnrollment() {
 
-        if (e.Student__c == null) {
-            throw new IllegalArgumentException('Student is required');
-        }
+        Student__c s = new Student__c(
+            Name = 'John',
+            Email__c = 'john@test.com',
+            GPA__c = 8,
+            Status__c = 'Active'
+        );
 
-        if (e.Course__c == null) {
-            throw new IllegalArgumentException('Course is required');
-        }
-    }
+        insert s;
 
-    public static void enrollStudent(
-        Id studentId,
-        Id courseId
-    ){
-        Enrollment__c e = new Enrollment__c();
-        e.Student__c = studentId;
-        e.Course__c = courseId;
-        validateEnrollment(e);
-        try{
-            insert e;
-        }catch (DmlException ex) {
+        Course__c c = new Course__c(
+            Name = 'Science',
+            Code__c = 'SCI101'
+        );
 
-            throw new AuraHandledException(
-                'Enrollment failed'
-            );
-        }
-    }
-    public static List<Enrollment__c> getEnrollments() {
+        insert c;
 
-        return [
-            SELECT Id, 
-            Student__c,
-            Student__r.Name,
-            Student__r.Last_Name__C,
-            Course__c,
-            Course__r.Name,
-            Status__c
+        Test.startTest();
+
+        EnrollmentService.enrollStudent(
+            s.Id,
+            c.Id
+        );
+
+        Test.stopTest();
+
+        List<Enrollment__c> result = [
+            SELECT Id
             FROM Enrollment__c
         ];
+
+        System.assertEquals(1, result.size());
     }
 }

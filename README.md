@@ -92,14 +92,14 @@ force-app/
 ### Salesforce App
 ![App](screenshots/ObjectManager.png)
 
-### Student Service
-![Student](screenshots/Student_service.png)
+### Student Test Service
+![Student](screenshots/student_service_test.png)
 
-### Enrollment Service
-![Enrollment](screenshots/enrollment_service.png)
+### Enrollment Test Service
+![Enrollment](screenshots/EnrollmentServiceTest.png)
 
-### Course Service
-![Course](screenshots/courseService.png)
+### Course Test Service
+![Course](screenshots/courseServiceTest.png)
 
 ### Flow Automation
 ![Flow](screenshots/flow_1.png)
