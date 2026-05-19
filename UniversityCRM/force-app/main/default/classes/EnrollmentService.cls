@@ -2,7 +2,11 @@ public with sharing class EnrollmentService {
 
     public class EnrollmentException extends Exception {}
 
+
     public static void validateEnrollments(List<Enrollment__c> enrollments) {
+
+        if(enrollments == null || enrollments.isEmpty()) return;
+
         for (Enrollment__c e : enrollments) {
             if (e.Student__c == null) throw new EnrollmentException('Student is required');
             if (e.Course__c  == null) throw new EnrollmentException('Course is required');
