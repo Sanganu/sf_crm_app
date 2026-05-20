@@ -1,41 +1,31 @@
-@isTest
+"@isTest
 private class CourseServiceTest {
 
-    @isTest
-    static void testCreateCourse() {
-
-        Course__c c = new Course__c();
-        c.Name = 'Math 101';
-        c.Code__c = 'M101';
-        c.Name__c = 'MATH';
-
+    @isTest static void creates_course() {
         Test.startTest();
-
-        CourseService.createCourse(c);
-
+        CourseService.createCourses(new List<Course__c>{
+            new Course__c(Name='Math 101', Code__c='M101')
+        });
         Test.stopTest();
-
-        List<Course__c> result = [
-            SELECT Id, Name, Code__c
-            FROM Course__c
-            WHERE Name = 'Math 101'
-        ];
-
-        System.assertEquals(1, result.size());
+        System.assertEquals(1, [SELECT COUNT() FROM Course__c WHERE Code__c='M101']);
     }
 
-    @isTest
-    static void testValidation() {
-
-        Course__c c = new Course__c();
-
+    @isTest static void rejects_missing_name() {
         try {
-            CourseService.createCourse(c);
+            CourseService.createCourses(new List<Course__c>{ new Course__c(Code__c='X') });
             System.assert(false);
-        } catch (Exception e) {
-            System.assert(
-                e.getMessage().contains('Course Name is required')
-            );
+        } catch (CourseService.CourseValidationException e) {
+            System.assert(e.getMessage().contains('Name'));
+        }
+    }
+
+    @isTest static void rejects_missing_code() {
+        try {
+            CourseService.createCourses(new List<Course__c>{ new Course__c(Name='X') });
+            System.assert(false);
+        } catch (CourseService.CourseValidationException e) {
+            System.assert(e.getMessage().contains('Code'));
         }
     }
 }
+"
