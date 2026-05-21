@@ -33,7 +33,7 @@ public with sharing class EnrollmentService {
         for (Enrollment__c e : incoming) {
             if (existing.containsKey(e.Student__c + '|' + e.Course__c)) {
                 throw new EnrollmentException('Student already enrolled in this course');
-            }
+            }   
         }
     }
 
@@ -69,4 +69,3 @@ public with sharing class EnrollmentService {
         ];
     }
 }
-"

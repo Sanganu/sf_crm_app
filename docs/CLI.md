@@ -34,6 +34,14 @@ sf project retrieve start
 sf project retrieve start --source-dir force-app
 ```
 
+```bash
+
+# Deploy ONLY one specific file to test it in isolation
+sf project deploy start --source-dir force-app/main/default/classes/StudentService.cls
+
+# Deploy a specific folder
+sf project deploy start --source-dir force-app/main/default/classes
+```
 
 To run your Apex **classes and tests** in the CLI, you mainly use two commands:
 
@@ -152,3 +160,30 @@ sf apex get test --test-run-id 707... --target-org DevOrg
 ```
 
 If you tell me your org alias and test class name, I can write the **exact ready‑to‑paste** commands for you to run in one shot.
+
+
+### LWC
+```bash
+# Install dependencies first
+npm install
+
+# Run local dev server — previews component in browser without deploying
+sf force lightning dev
+# or
+lwc-dev-server
+```
+
+
+```bash
+
+1. LOCAL VALIDATION (catch obvious errors before touching org)
+   sf project deploy start --dry-run
+   # Shows what would deploy and validates metadata, no actual push
+
+2. DEPLOY TO SCRATCH ORG FIRST (safe sandbox)
+   sf org create scratch --definition-file config/project-scratch-def.json
+   sf project deploy start
+
+3. ONLY THEN deploy to real sandbox/production
+
+```

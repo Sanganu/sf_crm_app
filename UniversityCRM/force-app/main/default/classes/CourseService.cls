@@ -1,17 +1,21 @@
 public with sharing class CourseService {
+    
+    public class CourseException extends Exception{}
+    public static void validateCourse(List<Course__c> courses) {
 
-    public static void validateCourse(Course__c c) {
+        if(courses == null || courses.isEmpty()) return;
+        for(Course__c c: courses){ 
+            if (String.isBlank(c.Course_Name__c)) {
+                throw new IllegalArgumentException('Course Name is required');
+            }
 
-        if (String.isBlank(c.Name)) {
-            throw new IllegalArgumentException('Course Name is required');
-        }
-
-        if (String.isBlank(c.Code__c)) {
-            throw new IllegalArgumentException('Course Code is required');
+            if (String.isBlank(c.Code__c)) {
+                throw new IllegalArgumentException('Course Code is required');
+            }
         }
     }
 
-    public static void createCourse(Course__c c) {
+    public static void createCourse(List<Course__c> c) {
 
         validateCourse(c); // validation FIRST
 
