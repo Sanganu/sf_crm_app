@@ -35,7 +35,6 @@ sf project retrieve start --source-dir force-app
 ```
 
 ```bash
-
 # Deploy ONLY one specific file to test it in isolation
 sf project deploy start --source-dir force-app/main/default/classes/StudentService.cls
 
@@ -43,6 +42,33 @@ sf project deploy start --source-dir force-app/main/default/classes/StudentServi
 sf project deploy start --source-dir force-app/main/default/classes
 ```
 
+```bash
+# login
+sf org open
+# Re-authenticate
+sf org login web --alias agentforce-org
+
+# Or if you know the username
+sf org login web --alias agentforce-org \
+  --login-url https://login.salesforce.com
+
+  # check
+  sf org list --all
+
+ # Logout
+ sf org logout --target-org DevOrg
+
+ #Logout All
+ sf org logout --all
+
+# Login
+sf org login web --alias DevOrg --instance-url https://login.salesforce.com
+
+# No Default Environment
+
+sf project retrieve start --source-dir force-app --target-org DevOrg
+
+````
 To run your Apex **classes and tests** in the CLI, you mainly use two commands:
 
 ```bash
@@ -105,7 +131,7 @@ The previous command outputs something like:
 sf apex get test --test-run-id 707...
 ```
 
-Copy that line and run it:
+
 
 ```bash
 sf apex get test --test-run-id 707... --target-org DevOrg
