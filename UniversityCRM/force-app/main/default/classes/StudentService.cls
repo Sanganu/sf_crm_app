@@ -15,7 +15,7 @@ public with sharing class StudentService {
                 throw new StudentException('Email is required');
             }
 
-            if (S.GPA__c != null && (S.GPA__c < 0 ||S.GPA__c > 4)) {
+            if (S.GPA__c != null && (S.GPA__c < GPA_MIN ||S.GPA__c > GPS_MAX)) {
                 throw new StudentException('GPA must be between 0 and 4');
             }
 

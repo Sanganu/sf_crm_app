@@ -35,6 +35,7 @@ private class StudentServiceTest {
     }
 
     @isTest static void gpaValidation(){
+        try{
             StudentService.validateStudent(new List<Student__c>{
                 new Student__c(
                     Name__c='Himachal',
@@ -42,7 +43,13 @@ private class StudentServiceTest {
                     Email__c ='spring@seasons.com',
                     GPA__c=-9)});
       
-            System.assert(false,'GPA must be between 0 and 4');
+            System.assert(false,'Expected GPA validation exception');
+            }catch(StudentService.StudentException e){
+                 System.assertEquals(
+            'GPA must be between 0 and 4',
+            e.getMessage()
+        );
+            }
     
     }
      
@@ -90,26 +97,27 @@ private class StudentServiceTest {
         System.assertNotEquals(null,studentId);
     }
 
-    // @isTest
-    // static void testValidation() {
-
-    //    List<Student__c> s = new List<Student__c>{
-    //         new Student__c(
-    //         Name__c='Ram',
-    //         Last_Name__c='Dasarathan',
-    //         Email__c='badGPAData@test.com',
-    //         GPA__c = 20)
-    //     };
-    //     try{
-    //         Test.startTest();
-    //         StudentService.validateStudent(s);
-    //         Test.stopTest();
-    //     }catch(Exception e){
-    //         exceptionThrown = true;
-    //         System.assertEquals('GPA must between 0 and 4',e.getMessage())
-    //     }
-    //         System.assert(false,'GPA must be between 0 and 4');
+    @isTest
+    static void testValidation() {
+        Boolean exceptionThrown = false;
+       List<Student__c> s = new List<Student__c>{
+            new Student__c(
+            Name__c='Ram',
+            Last_Name__c='Dasarathan',
+            Email__c='badGPAData@test.com',
+            GPA__c = 20)
+        };
+        try{
+            Test.startTest();
+            StudentService.validateStudent(s);
+            Test.stopTest();
+        }catch(Exception e){
+            exceptionThrown = true;
+            System.assertEquals('GPA must be between 0 and 4',e.getMessage());
+        }
+        System.assert(exceptionThrown, 'Expected StudentException to be thrown');
+           
         
 
-    //    }
+       }
 }
