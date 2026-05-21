@@ -7,6 +7,10 @@ sf org login web --alias DevOrg
 ```
 
 ```bash
+$ sf apex run test --test-level RunLocalTests --synchronous
+```
+
+```bash
  sf config set target-org DevOrg
  ```
 

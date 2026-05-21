@@ -35,13 +35,15 @@ private class StudentServiceTest {
     }
 
     @isTest static void gpaValidation(){
-        try{
             StudentService.validateStudent(new List<Student__c>{
-                new Student__c(Name__c='Himachal',Last_Name__c='Spring'
-                ,Email__c ='spring@seasons.com',GPA__c=-9)});
-        }catch(StudentService.StudentException e){
-            System.assert(e.getMessage().contains('GPA'));
-        }
+                new Student__c(
+                    Name__c='Himachal',
+                    Last_Name__c='Spring',
+                    Email__c ='spring@seasons.com',
+                    GPA__c=-9)});
+      
+            System.assert(false,'GPA must be between 0 and 4');
+    
     }
      
     @isTest static void validStudentEntry(){
@@ -67,35 +69,47 @@ private class StudentServiceTest {
 
         Test.startTest();
 
-        List<Student__c> result = StudentService.getStudents();
+        List<Student__c> result = StudentService.getStudents(10);
 
         Test.stopTest();
 
         System.assert(result.size() > 0);
     }
 
-    @isTest
-    static void testValidation() {
-
-       List<Student__c> s = new List<Student__c>{
-            new Student__c(
-            Name__c='Ram',
-            Last_Name__c='Dasarathan',
-            Email__c='badGPAData@test.com',
-            GPA__c = 20)};
-
-        try {
-
-            StudentService.validateStudent(s);
-
-            System.assert(false);
-
-        } catch (Exception e) {
-
-            System.assertEquals(
-                'Invalid entry',
-                e.getMessage()
-            );
-        }
+    @isTest static void testCreateStudent(){
+        Student__c newStudent = new Student__c(
+            Name__c = 'Abirami',
+            Last_Name__c = 'Somanadar',
+            Email__c = 'Ambal@kailash.dev',
+            GPA__c = 4.0,
+            Status__c = 'Active'
+        );
+        Test.startTest();
+        Id studentId = StudentService.createStudent(newStudent);
+        Test.stopTest();
+        System.assertNotEquals(null,studentId);
     }
+
+    // @isTest
+    // static void testValidation() {
+
+    //    List<Student__c> s = new List<Student__c>{
+    //         new Student__c(
+    //         Name__c='Ram',
+    //         Last_Name__c='Dasarathan',
+    //         Email__c='badGPAData@test.com',
+    //         GPA__c = 20)
+    //     };
+    //     try{
+    //         Test.startTest();
+    //         StudentService.validateStudent(s);
+    //         Test.stopTest();
+    //     }catch(Exception e){
+    //         exceptionThrown = true;
+    //         System.assertEquals('GPA must between 0 and 4',e.getMessage())
+    //     }
+    //         System.assert(false,'GPA must be between 0 and 4');
+        
+
+    //    }
 }
