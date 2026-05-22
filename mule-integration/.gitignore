@@ -1,0 +1,25 @@
+/.metadata/
+
+# Mule
+target/
+.mule/
+logs/
+
+# Eclipse / Anypoint
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IntelliJ / VSCode
+.idea/
+.vscode/
+
+# Maven
+.mvn/
+
+# Java
+*.class

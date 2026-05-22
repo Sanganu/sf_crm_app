@@ -1,2 +1,17 @@
 docs/UpgradesToBedone.md
 beginner/*
+# Anypoint workspace
+mule-integration/.metadata/
+mule-integration/.mule/
+
+# Mule build
+**/target/
+
+# Eclipse/Studio
+**/.classpath
+**/.project
+**/.settings/
+
+# OS
+.DS_Store
+Thumbs.db
