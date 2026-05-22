@@ -2,9 +2,9 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Letter_Grade__c</fullName>
     <externalId>false</externalId>
-    <formula>If(Grade__c &gt;= 9,&quot;A&quot;,
-If(Grade__c &gt;= 7,&quot;B&quot;,
-If(Grade__c &gt;= 5,&quot;C&quot;,&quot;F&quot;)))</formula>
+    <formula>If(Grade__c &gt;= 90,&quot;A&quot;,
+If(Grade__c &gt;= 70,&quot;B&quot;,
+If(Grade__c &gt;= 50,&quot;C&quot;,&quot;F&quot;)))</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Letter Grade</label>
     <required>false</required>

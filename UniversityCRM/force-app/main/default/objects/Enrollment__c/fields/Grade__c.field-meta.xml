@@ -3,7 +3,7 @@
     <fullName>Grade__c</fullName>
     <externalId>false</externalId>
     <label>Grade</label>
-    <precision>6</precision>
+    <precision>7</precision>
     <required>false</required>
     <scale>2</scale>
     <trackHistory>false</trackHistory>
