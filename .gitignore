@@ -3,6 +3,7 @@ beginner/*
 # Anypoint workspace
 mule-integration/.metadata/
 mule-integration/.mule/
+UniversityCRM/.mule
 
 # Mule build
 **/target/
