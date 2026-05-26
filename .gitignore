@@ -16,3 +16,9 @@ UniversityCRM/.mule
 # OS
 .DS_Store
 Thumbs.db
+**/plugins-tmp/
+**/repository/
+
+# Mule build
+mule-integration/target/
+**/*.jar

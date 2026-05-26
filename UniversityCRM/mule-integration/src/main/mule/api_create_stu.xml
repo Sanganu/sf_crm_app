@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="APIROUTEFlow" doc:id="ae68b153-9a02-4580-b2de-8a16fc8d7115" >
+		<http:listener doc:name="Listener" doc:id="ac7ca1ba-f224-4241-8d28-c867183fc718" config-ref="HTTP_Listener_config" path="student/new" allowedMethods="POST"/>
+		<logger level="INFO" doc:name="Logger" doc:id="68ea85bc-54d5-488f-a317-09b92c20814a" message="#[payload]"/>
+	</flow>
+</mule>

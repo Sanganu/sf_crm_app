@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="api_update_stuFlow" doc:id="d1b20bd9-6064-493b-b0c1-046ab2044056" >
+		<http:listener doc:name="Listener" doc:id="ed93ba8a-9e99-43b4-b214-8df55fa49279" config-ref="HTTP_Listener_config" path="student/edit" allowedMethods="PUT"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b12b0ecd-ebe0-4512-93a7-99ab735d814e" message="#[payload.Student__c.Date_of_Birth.@id]"/>
+		<ee:transform doc:name="Transform Message" doc:id="ff4d12c5-fec1-4345-a69e-958a3823fb24">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="3dcebb45-6fb2-4eb4-9847-2f1a615e12ca" message="payload"/>
+	</flow>
+</mule>
