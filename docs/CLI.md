@@ -77,6 +77,11 @@ sf apex run test
 and
 ```bash
 sf apex run
+
+
+# To retrieve Triggers created in UI
+
+sf project retrieve start --metadata ApexTrigger:YourTriggerName
 ```
 
 Here’s how to use them in sequence.
@@ -97,6 +102,12 @@ cd salesforce-crm-dev-starter
 
 ```bash
 sf org login web
+
+# retrieve xml
+sf project retrieve start --manifest manifest/package.xml
+
+
+#
 ```
 
 Then choose your org and log in.
