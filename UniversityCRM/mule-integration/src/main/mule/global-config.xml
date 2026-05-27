@@ -15,13 +15,14 @@
     <configuration-properties file="config.properties" />
 
     <!-- 2. Salesforce connection using values from that file -->
-    <salesforce:sfdc-config name="Salesforce_Config">
-        <salesforce:basic-connection
-            username="${sf.username}"
-            password="${sf.password}"
-            securityToken="${sf.token}"
-            url="https://login.salesforce.com/services/Soap/u/56.0" />
-    </salesforce:sfdc-config>
+	<salesforce:sfdc-config name="Salesforce_Config">
+	    <salesforce:oauth-user-pass-connection
+	        consumerKey="${sf.consumerKey}"
+	        consumerSecret="${sf.consumerSecret}"
+	        username="${sf.username}"
+	        password="${sf.password}"
+	        securityToken="${sf.token}" />
+	</salesforce:sfdc-config>
 
     <!-- 3. HTTP Listener connection -->
     <http:listener-config name="HTTP_Listener_Config">
