@@ -22,3 +22,6 @@ Thumbs.db
 # Mule build
 mule-integration/target/
 **/*.jar
+
+
+**/config.properties

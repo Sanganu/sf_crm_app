@@ -1,0 +1,178 @@
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"
+      xmlns:http=\"http://www.mulesoft.org/schema/mule/http\"
+      xmlns:apikit=\"http://www.mulesoft.org/schema/mule/mule-apikit\"
+      xmlns:email=\"http://www.mulesoft.org/schema/mule/email\"
+      xmlns:ee=\"http://www.mulesoft.org/schema/mule/ee/core\"
+      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
+      xsi:schemaLocation=\"
+        http://www.mulesoft.org/schema/mule/core         http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http         http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/mule-apikit  http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+        http://www.mulesoft.org/schema/mule/email        http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+        http://www.mulesoft.org/schema/mule/ee/core      http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd\">
+
+    <configuration-properties file=\"config-${env}.yaml\"/>
+
+    <http:listener-config name=\"LISTENER\">
+        <http:listener-connection host=\"0.0.0.0\" port=\"${http.port}\"/>
+    </http:listener-config>
+
+    <http:request-config name=\"SF_SYS\" basePath=\"/api/v1\">
+        <http:request-connection host=\"${sf.sys.host}\" port=\"${sf.sys.port}\"/>
+    </http:request-config>
+    <http:request-config name=\"SIS_SYS\" basePath=\"/api/v1\">
+        <http:request-connection host=\"${sis.sys.host}\" port=\"${sis.sys.port}\"/>
+    </http:request-config>
+    <http:request-config name=\"LMS_SYS\" basePath=\"/api/v1\">
+        <http:request-connection host=\"${lms.sys.host}\" port=\"${lms.sys.port}\"/>
+    </http:request-config>
+
+    <email:smtp-config name=\"MAILER\">
+        <email:smtps-connection host=\"${smtp.host}\" port=\"${smtp.port}\"
+                                user=\"${smtp.user}\" password=\"${secure::smtp.password}\"/>
+    </email:smtp-config>
+
+    <apikit:config name=\"api\" api=\"resource::enrollment-process-api.raml\"/>
+
+    <flow name=\"enrollment-process-api-main\">
+        <http:listener config-ref=\"LISTENER\" path=\"/api/v1/*\"/>
+        <apikit:router config-ref=\"api\"/>
+    </flow>
+
+    <flow name=\"post:\enrollments:application\json:api\">
+        <!-- 1. Validate course exists in SIS -->
+        <http:request config-ref=\"SIS_SYS\" method=\"GET\"
+                      path=\"/courses/{code}\">
+            <http:uri-params>#[{ code: payload.courseCode }]</http:uri-params>
+        </http:request>
+        <choice>
+            <when expression=\"#[payload.error?]\">
+                <raise-error type=\"APP:COURSE_NOT_FOUND\"
+                             description=\"#[payload.error]\"/>
+            </when>
+        </choice>
+        <set-variable variableName=\"course\" value=\"#[payload]\"/>
+
+        <!-- Idempotency -->
+        <http:request config-ref=\"SF_SYS\" method=\"GET\" path=\"/students\">
+            <http:query-params>#[{ email: vars.request.email }]</http:query-params>
+        </http:request>
+        <set-variable variableName=\"existingStudent\" value=\"#[payload[0]]\"/>
+
+        <!-- Create student in Salesforce  -->
+        <choice>
+            <when expression=\"#[vars.existingStudent == null]\">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[
+                            %dw 2.0
+                            output application/json
+                            ---
+                            {
+                                firstName: vars.request.firstName,
+                                lastName:  vars.request.lastName,
+                                email:     vars.request.email
+                            }
+                        ]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <http:request config-ref=\"SF_SYS\" method=\"POST\" path=\"/students\"/>
+                <set-variable variableName=\"salesforceStudentId\" value=\"#[payload.id]\"/>
+            </when>
+            <otherwise>
+                <set-variable variableName=\"salesforceStudentId\"
+                              value=\"#[vars.existingStudent.id]\"/>
+            </otherwise>
+        </choice>
+
+        <!-- 4. SF +  LMS account -->
+        <scatter-gather>
+            <route>
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[
+                            %dw 2.0
+                            output application/json
+                            ---
+                            {
+                                studentId: vars.salesforceStudentId,
+                                courseId:  vars.course.code
+                            }
+                        ]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <http:request config-ref=\"SF_SYS\" method=\"POST\" path=\"/enrollments\"/>
+            </route>
+            <route>
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[
+                            %dw 2.0
+                            output application/json
+                            ---
+                            { email: vars.request.email, role: \"student\" }
+                        ]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <http:request config-ref=\"LMS_SYS\" method=\"POST\" path=\"/accounts\"/>
+            </route>
+        </scatter-gather>
+
+        <!-- 5. Welcome email -->
+        <email:send config-ref=\"MAILER\"
+                    subject=\"Welcome to the University!\"
+                    fromAddress=\"${smtp.from}\">
+            <email:to-addresses>
+                <email:to-address value=\"#[vars.request.email]\"/>
+            </email:to-addresses>
+            <email:body contentType=\"text/html\"><![CDATA[
+                <h1>You're enrolled!</h1>
+                <p>Course: #[vars.course.name]</p>
+            ]]></email:body>
+        </email:send>
+
+        <!-- 6. Build response -->
+        <ee:transform>
+            <ee:message>
+                <ee:set-payload><![CDATA[
+                    %dw 2.0
+                    output application/json
+                    ---
+                    {
+                        enrollmentId:        payload[0].payload.id,
+                        salesforceStudentId: vars.salesforceStudentId,
+                        lmsAccountId:        payload[1].payload.accountId,
+                        status:              \"enrolled\"
+                    }
+                ]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <error-handler>
+            <on-error-propagate type=\"APP:COURSE_NOT_FOUND\">
+                <ee:transform>
+                    <ee:variables>
+                        <ee:set-variable variableName=\"httpStatus\">404</ee:set-variable>
+                    </ee:variables>
+                    <ee:message>
+                        <ee:set-payload value='#[{ \"error\": \"Course not found in SIS\" }]'/>
+                    </ee:message>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type=\"HTTP:CONNECTIVITY, HTTP:TIMEOUT\">
+                <ee:transform>
+                    <ee:variables>
+                        <ee:set-variable variableName=\"httpStatus\">502</ee:set-variable>
+                    </ee:variables>
+                    <ee:message>
+                        <ee:set-payload value='#[{ \"error\": \"Downstream system unavailable\" }]'/>
+                    </ee:message>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+   <flow name=\"request-capture\">
+        <set-variable variableName=\"request\" value=\"#[payload]\"/>
+    </flow>
+</mule>
