@@ -92,11 +92,6 @@ force-app/
 ### Salesforce App
 ![App](screenshots/ObjectManager.png)
 
-### Student Test Service
-![Student](screenshots/student_service_test.png)
-
-### Enrollment Test Service
-![Enrollment](screenshots/EnrollmentServiceTest.png)
 
 ### Course Test Service
 ![Course](screenshots/courseServiceTest.png)
@@ -116,6 +111,7 @@ force-app/
 ---
 
 ## Author
+Sangeetha.K
 
 GitHub Repository:
 

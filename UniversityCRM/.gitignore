@@ -49,3 +49,9 @@ $RECYCLE.BIN/
 /.metadata/
 .mule/*
 src/main/resources/api/config.properties
+
+/.tooling/*
+/.tooling-apps-cache/*
+
+.tooling/*
+.tooling-apps-cache/*
