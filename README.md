@@ -99,14 +99,17 @@ force-app/
 ### Flow Automation
 ![Flow](screenshots/flow_1.png)
 
+
+### WorkFlow
+![recording](https://app.screencastify.com/watch/BK6g64SJej19RK0mYAHE?checkOrg=8ed4b90c-130c-460b-a458-cc6e867f308f)
 ---
 
 ## Future Improvements
 
-- REST API integration
+
 - Lightning Web Components (LWC)
 - Dashboard reporting
-- MuleSoft integration concepts
+
 
 ---
 
