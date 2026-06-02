@@ -55,7 +55,7 @@ private class StudentServiceTest {
      
     @isTest static void validStudentEntry(){
         StudentService.validateStudent(new List<Student__c>{
-            new Student__C(Name__c='Apple',
+            new Student__c(Name__c='Apple',
             Last_Name__c = 'Banana',
             Email__c ='Apple@fruits.com',
             GPA__c=3.6)});
@@ -68,7 +68,7 @@ private class StudentServiceTest {
             Name__c='Sita',
             Last_Name__c='Ram',
             Email__c = 'john@test.com',
-            GPA__c = 8,
+            GPA__c = 3.5,
             Status__c = 'Active'
         );
 
