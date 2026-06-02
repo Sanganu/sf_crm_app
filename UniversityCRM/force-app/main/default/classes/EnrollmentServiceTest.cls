@@ -12,12 +12,10 @@ public class EnrollmentServiceTest {
                 Email__c ='st_em'+i+'@gtest.com',
                 GPA__c = 2.9+i*0.2
             ));
-            Integer min = 50, max = 150;
-            Integer randRange = min + (Integer)(Math.random() * (max - min));
-            Integer rnd = (Integer)(i*randRange);
             courseList.add(new Course__c(
-                Course_Name__c = 'Sub-'+rnd,
-                Code__c = 'CO-'+rnd
+                Name__c = 'Sub-'+i,
+                Course_Name__c = 'Sub-'+i,
+                Code__c = 'CO-'+i
             ));
         }
         insert as user studentsList;
@@ -27,7 +25,7 @@ public class EnrollmentServiceTest {
     }
 
     @isTest static void validateNullEnrollment() {
-        Test.startTest();
+        System.Test.startTest();
         try {
             EnrollmentService.enrollStudents(null,null);
             System.assert(false, 'Expected enrollment validation exception');
@@ -35,11 +33,11 @@ public class EnrollmentServiceTest {
             System.assert(e.getMessage().contains('required'));
         }
 
-        Test.stopTest();
+        System.Test.stopTest();
     }
 
     @isTest static void validateEmptyEnrollment() {
-        Test.startTest();
+        System.Test.startTest();
         try {
             EnrollmentService.validateEnrollments(new List<Enrollment__c>{
                 new Enrollment__c()
@@ -48,10 +46,9 @@ public class EnrollmentServiceTest {
         } catch (EnrollmentService.EnrollmentException e) {
             System.assertEquals('Student is required', e.getMessage());
         }
-        Test.stopTest();
+        System.Test.stopTest();
     }
-   
-  
+    
 
     @isTest static void getLimitedEnrollments() {
         List<Id> studentIds = new List<Id>();
@@ -60,10 +57,10 @@ public class EnrollmentServiceTest {
         }
         Id courseId = [SELECT Id FROM Course__c LIMIT 1].Id;
 
-        Test.startTest();
+        System.Test.startTest();
         EnrollmentService.enrollStudents(studentIds, courseId);
         List<Enrollment__c> recordCount = EnrollmentService.getEnrollments();
-        Test.stopTest();
+        System.Test.stopTest();
         System.assertEquals(3, recordCount.size());
     }
   

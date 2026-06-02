@@ -5,12 +5,16 @@ public with sharing class CourseService {
 
         if(courses == null || courses.isEmpty()) return;
         for(Course__c c: courses){ 
+            if (String.isBlank(c.Name__c)) {
+                throw new CourseException('Name is required');
+            }
+
             if (String.isBlank(c.Course_Name__c)) {
-                throw new IllegalArgumentException('Course Name is required');
+                throw new CourseException('Course Name is required');
             }
 
             if (String.isBlank(c.Code__c)) {
-                throw new IllegalArgumentException('Course Code is required');
+                throw new CourseException('Course Code is required');
             }
         }
     }
