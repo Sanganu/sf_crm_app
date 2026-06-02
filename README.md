@@ -101,14 +101,10 @@ force-app/
 
 
 ### Execution Testcases
-![Test Case](screenhots/Testcaseexecution.png)
+![Test Case](screenshots/Testcaseexecution.png)
 
 ### WorkFlow
 
-#### New Student 
-![Screenshot1-New Student ]()
-
-#### Existing Student
 
 
 
