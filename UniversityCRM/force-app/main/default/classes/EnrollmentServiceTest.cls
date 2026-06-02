@@ -18,8 +18,8 @@ public class EnrollmentServiceTest {
                 Code__c = 'CO-'+i
             ));
         }
-        insert as user studentsList;
-        insert as user courseList;
+        insert studentsList;
+        insert courseList;
         System.assertEquals(5, [SELECT COUNT() FROM Student__c]);
         System.assertEquals(5,[SELECT COUNT() FROM Course__c]);
     }
