@@ -224,3 +224,30 @@ lwc-dev-server
 3. ONLY THEN deploy to real sandbox/production
 
 ```
+
+
+# Login via browser
+sf org login web --alias myOrg
+
+# Check connected orgs
+sf org list
+
+sf apex run test  --target-org DevOrg  --result-format human   --wait 10
+
+# Developer Console version:
+# Debug → Open Execute Anonymous Window → paste code → Execute
+
+# CLI version:
+sf apex run --file myScript.apex --target-org myOrg
+
+# Or one-liner:
+echo "System.debug('Hello!');" | sf apex run --target-org myOrg
+
+# Human readable (default — easiest to read)
+--result-format human
+
+# JSON (for scripts / CI pipelines)
+--result-format json
+
+# JUnit (for tools like Jenkins)
+--result-format junit
