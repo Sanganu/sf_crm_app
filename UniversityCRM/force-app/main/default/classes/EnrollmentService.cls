@@ -13,7 +13,7 @@ public with sharing class EnrollmentService {
         }
     }
 
-    //Duplicates (Set is used)
+    //Duplicates 
     private static void rejectDuplicates(List<Enrollment__c> incoming) {
         Set<Id> studentIds = new Set<Id>();
         Set<Id> courseIds  = new Set<Id>();
