@@ -11,6 +11,14 @@ $ sf apex run test --test-level RunLocalTests --synchronous
 ```
 
 ```bash
+# To dry run
+
+sf project deploy start   --source-dir force-app   --test-level RunLocalTests   --dry-run   --target-org DevOrg
+
+
+```
+
+```bash
  sf config set target-org DevOrg
  ```
 
