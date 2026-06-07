@@ -18,9 +18,9 @@ private class StudentServiceTest {
     }
 
      @isTest static void getStudents_returns_rows_limited() {
-        System.Test.startTest();
+        Test.startTest();
         List<Student__c> r = StudentService.getStudents(3);
-        System.Test.stopTest();
+        Test.stopTest();
         System.assertEquals(3, r.size());
     }
 
@@ -74,11 +74,11 @@ private class StudentServiceTest {
 
         insert s;
 
-        System.Test.startTest();
+        Test.startTest();
 
         List<Student__c> result = StudentService.getStudents(10);
 
-        System.Test.stopTest();
+        Test.stopTest();
 
         System.assert(result.size() > 0);
     }
@@ -91,9 +91,9 @@ private class StudentServiceTest {
             GPA__c = 4.0,
             Status__c = 'Active'
         );
-        System.Test.startTest();
+        Test.startTest();
         Id studentId = StudentService.createStudent(newStudent);
-        System.Test.stopTest();
+        Test.stopTest();
         System.assertNotEquals(null,studentId);
     }
 
@@ -108,9 +108,9 @@ private class StudentServiceTest {
             GPA__c = 20)
         };
         try{
-            System.Test.startTest();
+            Test.startTest();
             StudentService.validateStudent(s);
-            System.Test.stopTest();
+            Test.stopTest();
         }catch(Exception e){
             exceptionThrown = true;
             System.assertEquals('GPA must be between 0 and 4',e.getMessage());
