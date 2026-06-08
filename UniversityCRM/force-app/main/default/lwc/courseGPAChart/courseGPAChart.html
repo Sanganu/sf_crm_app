@@ -1,0 +1,36 @@
+<template>
+    <lightning-card title="Average Grade Per Course" icon-name="standard:education">
+        
+        <div class="slds-m-around_medium">
+
+            <template if:true={error}>
+                <p style="color:red;">Error loading data</p>
+            </template>
+
+            <template if:true={chartData.length}>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Average Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={chartData} for:item="row">
+                            <tr key={row.courseName}>
+                                <td>{row.courseName}</td>
+                                <td>{row.avgGrade}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+
+            <template if:false={chartData.length}>
+                <p>No enrollment data found.</p>
+            </template>
+
+        </div>
+
+    </lightning-card>
+</template>
