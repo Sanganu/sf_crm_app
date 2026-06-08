@@ -1,3 +1,15 @@
 <template>
-    <h1>Enrollment Panel</h1>
+    <h1>Enrollments</h1>
+
+    <template if:true={enrollments.data}>
+        <template for:each={enrollments.data} for:item="enrollment">
+            <p key={enrollment.Id}>
+                {enrollment.Student__r.Name} — {enrollment.Course__r.Name} — {enrollment.Status__c}
+            </p>
+        </template>
+    </template>
+
+    <template if:true={enrollments.error}>
+        <p>Error loading enrollments</p>
+    </template>
 </template>
