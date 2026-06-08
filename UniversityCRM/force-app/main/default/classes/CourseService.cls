@@ -25,4 +25,5 @@ public with sharing class CourseService {
 
         insert c;
     }
+
 }
