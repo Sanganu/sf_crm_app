@@ -17,8 +17,8 @@ public with sharing class CourseServiceTriggerHandler extends TriggerHandler{
             validateEnrollmentDate(course);
             setDefault(course);
         }
-
     }
+    
     protected override void beforeUpdate(){
         for(Course__c course:newCourses){
             Course__c oldCourse = oldCoursesMap.get(course.Id);
