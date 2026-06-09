@@ -1,5 +1,4 @@
-@isTest
-private class StudentServiceTest {
+@isTest private class StudentServiceTest {
 
     @TestSetup
     //Create Test data

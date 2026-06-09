@@ -1,5 +1,4 @@
-@isTest
-class StudentTriggerHandlerTest{
+@isTest private class StudentTriggerHandlerTest{
     @isTest
     static void testGpaStatus(){
         List<Student__c> students = new List<Student__c>{

@@ -1,5 +1,4 @@
-@isTest
-private class EnrollmentTriggerHandlerTest {
+@isTest private class EnrollmentTriggerHandlerTest {
 
     // ── Test Data Setup ──────────────────────────────────────
 

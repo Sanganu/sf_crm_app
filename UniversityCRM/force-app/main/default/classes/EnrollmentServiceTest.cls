@@ -1,6 +1,4 @@
-@isTest
-public class EnrollmentServiceTest {
-
+@isTest private class EnrollmentServiceTest {
     @TestSetup
     static void makeData(){
         List<Student__c> studentsList = new List<Student__c>();
