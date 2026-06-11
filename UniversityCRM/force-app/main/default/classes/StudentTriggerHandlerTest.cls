@@ -10,4 +10,10 @@
         System.assertEquals('Active', students[0].Status__c);
         System.assertEquals('New',    students[1].Status__c);
     }
+
+    @isTest
+    static void testNullInput(){
+        StudentTriggerHandler.applyStatusFromGpa(null);
+        System.assert(true);
+    }
 }

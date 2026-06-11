@@ -111,11 +111,16 @@ force-app/
 
 ---
 
+## What's Built
+- Apex Trigger Handlers — all 3 objects
+- LWC enrollmentPanel — live data on Student Record Page
+- LWC courseGPAChart — University Dashboard App Page
+- CourseGPA Controller with DTO pattern
+- MuleSoft integration layer
+- Record-triggered Flow on Student__c
+- Full deployment via Salesforce CLI
+
 ## Future Improvements
-
-
-- Lightning Web Components (LWC)
-- Dashboard reporting
 
 
 ---
