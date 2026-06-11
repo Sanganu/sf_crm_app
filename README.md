@@ -2,9 +2,10 @@
 
 ## Overview
 
-This project is a simple University CRM application built on Salesforce to manage students, courses, and enrollments.
-
-The goal of this project was to gain hands-on experience with the Salesforce ecosystem and demonstrate practical CRM development skills using Apex, SOQL, Flow Automation, and Salesforce DX.
+A full-stack University CRM demonstrating end-to-end 
+Salesforce development — Apex business logic, LWC 
+front-end components, and a MuleSoft integration layer 
+that mirrors a real university Banner-to-Salesforce pipeline.
 
 
 ## What's Built
