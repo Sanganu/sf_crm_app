@@ -4,6 +4,7 @@
         <members>Student__c</members>
         <members>Enrollment__c</members>
         <members>Course__c</members>
+        <members>Integration_Log__c</members>
         <name>CustomObject</name>
    </types>
    <types>
@@ -18,5 +19,13 @@
         <members>*</members>
         <name>ApexTrigger</name>
     </types>
+    <types>
+    <members>*</members>
+    <name>Flow</name>
+</types>
+<types>
+    <members>*</members>
+    <name>CustomTab</name>
+</types>
   <version>66.0</version>
 </Package>

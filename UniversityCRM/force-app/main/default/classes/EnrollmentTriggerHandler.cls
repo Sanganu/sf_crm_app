@@ -110,38 +110,7 @@ public with sharing class EnrollmentTriggerHandler extends TriggerHandler {
 
         if (!enrollStudent.isEmpty()) {
             update as user enrollStudent.values();
-            sendEnrollmentEmails(enrollStudent.values()); // ← added semicolon
         }
     }
 
-    // ── 5. Send email on promotion ─────────────────────────
-
-    private static void sendEnrollmentEmails(List<Enrollment__c> newEnrollments) {
-        List<Messaging.SingleEmailMessage> emails =  // ← fixed variable name
-            new List<Messaging.SingleEmailMessage>();
-
-        for (Enrollment__c e : newEnrollments) {
-            if (e.Student__r.Email__c == null) continue;
-
-            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage(); // ← added semicolon
-            mail.setToAddresses(
-                new List<String>{ e.Student__r.Email__c } // ← fixed String typo
-            );
-            mail.setSubject(
-                'Congrats! You have been enrolled in ' + e.Course__r.Name
-            );
-            mail.setPlainTextBody(
-                'Hi ' + e.Student__r.Name + ',\n\n' +
-                'Great news! A seat has opened up and you have been moved from ' +
-                'the waitlist to enrolled.\n\n' +
-                'Please meet your counsellor to discuss your credits and classes.\n\n' +
-                'University CRM Team'
-            );
-            emails.add(mail);
-        }
-
-        if (!emails.isEmpty()) {
-            Messaging.sendEmail(emails);
-        }
-    }
 }

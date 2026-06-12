@@ -15,6 +15,7 @@
     <tabs>Student__c</tabs>
     <tabs>Course__c</tabs>
     <tabs>Enrollment__c</tabs>
+    <tabs>Integration_Log__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>University_CRM_UtilityBar</utilityBar>
 </CustomApplication>
