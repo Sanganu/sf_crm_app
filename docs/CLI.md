@@ -86,6 +86,7 @@ and
 ```bash
 sf apex run
 
+sf project retrieve start --metadata Flow
 
 # To retrieve Triggers created in UI
 
