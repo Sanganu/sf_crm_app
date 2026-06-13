@@ -93,7 +93,7 @@
         Test.startTest();
         Id studentId = StudentService.createStudent(newStudent);
         Test.stopTest();
-        System.assertNotEquals(null,studentId);
+       System.assertEquals(1, [SELECT COUNT() FROM Student__c WHERE Id=:studentId]);
     }
 
     @isTest

@@ -57,12 +57,14 @@ public with sharing class EnrollmentService {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<Enrollment__c> getEnrollments() {
+    public static List<Enrollment__c> getEnrollmentsForStudents(Id studentId) {
+        if(studentId == null) return new List<Enrollment__c();
         return [
             SELECT Id, Status__c,
                    Student__c, Student__r.Name, Student__r.Name__c, Student__r.Last_Name__c,
                    Course__c,  Course__r.Name,  Course__r.Code__c
             FROM Enrollment__c
+            WHERE Student__c = :studentId
             WITH USER_MODE
             ORDER BY CreatedDate DESC
             LIMIT 200

@@ -37,7 +37,7 @@ public with sharing class StudentService {
             LIMIT :safeLimit];
     }
 
-    @AuraEnabled(cacheable=true)
+  
     public static Id createStudent(Student__c s){
         try {
             validateStudent(new List<Student__c> { s });
