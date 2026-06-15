@@ -1,13 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Sends a confirmation email when an Enrollment becomes 'Enrolled' (insert or update). Async — does not block the enrollment commit.</description>
+    <interviewLabel>Enrollment Email Notification {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Enrollment Email Notification</label>
+    <processType>AutoLaunchedFlow</processType>
+    <runInMode>SystemModeWithoutSharing</runInMode>
+    <status>Active</status>
+
+    <start>
+        <object>Enrollment__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>TEXT({!$Record.Status__c}) = 'Enrolled'</filterFormula>
+        <connector><targetReference>Has_Recipient</targetReference></connector>
+    </start>
+
+    <decisions>
+        <name>Has_Recipient</name>
+        <label>Recipient email present?</label>
+        <rules>
+            <name>Yes</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Student__r.Email__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue><booleanValue>false</booleanValue></rightValue>
+            </conditions>
+            <connector><targetReference>Send_Enrollment_Email</targetReference></connector>
+        </rules>
+        <defaultConnector><targetReference>Log_Missing_Email</targetReference></defaultConnector>
+    </decisions>
+
     <actionCalls>
         <name>Send_Enrollment_Email</name>
         <label>Send Enrollment Email</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <flowTransactionModel>NewTransaction</flowTransactionModel>
+        <faultConnector><targetReference>Log_Email_Failure</targetReference></faultConnector>
+        <inputParameters>
+            <name>emailTemplateId</name>
+            <value><elementReference>$Label.Enrollment_Confirmation_Template_Id</elementReference></value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailMessagingId</name>
+            <value><elementReference>$Record.Id</elementReference></value>
+        </inputParameters>
         <inputParameters>
             <name>recipientAddresses</name>
             <value>
@@ -17,70 +57,48 @@
             </value>
         </inputParameters>
         <inputParameters>
-            <name>composeEmailContent</name>
-            <value>
-                <stringValue>True</stringValue>
-            </value>
+            <name>senderType</name>
+            <value><stringValue>OrgWideEmailAddress</stringValue></value>
         </inputParameters>
         <inputParameters>
-            <name>emailSubject</name>
-            <value>
-                <stringValue>Enrollment confirmation</stringValue>
-            </value>
+            <name>senderAddress</name>
+            <value><stringValue>registrar@your-university.edu</stringValue></value>
         </inputParameters>
-        <inputParameters>
-            <name>emailBody</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>&lt;p&gt;Dear {!$Record.Student__r.Name__c} {!$Record.Student__r.Last_Name__c},&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;You have been successfully enrolled in the following course:&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;Course Name: {!$Record.Course__r.Course_Name__c}&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;Course ID: {!$Record.Course__r.Code__c}&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;Credits:{!$Record.Course__r.Credits__c}&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;If you have any questions, please &lt;/p&gt;&lt;p&gt;don&apos;t hesitate to reach out.&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;Best regards,&lt;/p&gt;&lt;p&gt;Admin]&lt;/p&gt;</stringValue>
-            </value>
-        </inputParameters>
-        <nameSegment>emailSimple</nameSegment>
-        <offset>0</offset>
-        <versionString>2.0.1</versionString>
     </actionCalls>
-    <apiVersion>66.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <environments>Default</environments>
-    <interviewLabel>Enrollment Email Notification {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Enrollment Email Notification</label>
-    <processMetadataValues>
-        <name>BuilderType</name>
-        <value>
-            <stringValue>LightningFlowBuilder</stringValue>
-        </value>
-    </processMetadataValues>
-    <processMetadataValues>
-        <name>CanvasMode</name>
-        <value>
-            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
-        </value>
-    </processMetadataValues>
-    <processMetadataValues>
-        <name>OriginBuilderType</name>
-        <value>
-            <stringValue>LightningFlowBuilder</stringValue>
-        </value>
-    </processMetadataValues>
-    <processType>AutoLaunchedFlow</processType>
-    <start>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <connector>
-            <targetReference>Send_Enrollment_Email</targetReference>
-        </connector>
-        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Status__c</field>
-            <operator>EqualTo</operator>
-            <value>
-                <stringValue>Enrolled</stringValue>
-            </value>
-        </filters>
-        <object>Enrollment__c</object>
-        <recordTriggerType>Update</recordTriggerType>
-        <triggerType>RecordAfterSave</triggerType>
-    </start>
-    <status>Active</status>
+
+    <recordCreates>
+        <name>Log_Email_Failure</name>
+        <label>Log email failure</label>
+        <object>Integration_Log__c</object>
+        <inputAssignments>
+            <field>Direction__c</field><value><stringValue>Outbound-Email</stringValue></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status_Code__c</field><value><stringValue>FAIL</stringValue></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Error_Message__c</field><value><elementReference>$Flow.FaultMessage</elementReference></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>External_Id__c</field><value><elementReference>$Record.Id</elementReference></value>
+        </inputAssignments>
+    </recordCreates>
+
+    <recordCreates>
+        <name>Log_Missing_Email</name>
+        <label>Log missing recipient</label>
+        <object>Integration_Log__c</object>
+        <inputAssignments>
+            <field>Direction__c</field><value><stringValue>Outbound-Email</stringValue></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status_Code__c</field><value><stringValue>SKIP</stringValue></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Error_Message__c</field><value><stringValue>Student email is blank</stringValue></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>External_Id__c</field><value><elementReference>$Record.Id</elementReference></value>
+        </inputAssignments>
+    </recordCreates>
 </Flow>

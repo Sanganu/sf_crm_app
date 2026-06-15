@@ -25,3 +25,4 @@ mule-integration/target/
 
 
 **/config.properties
+UniversityCRM/force-app/main/default/flows/update.xml
