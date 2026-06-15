@@ -152,6 +152,8 @@ sf apex get test --test-run-id 707...
 ```
 
 
+sf project retrieve start --metadata "CustomObject:Integration_Log__c"
+
 
 ```bash
 sf apex get test --test-run-id 707... --target-org DevOrg
