@@ -4,7 +4,7 @@
     <externalId>false</externalId>
     <label>Max Capacity</label>
     <precision>3</precision>
-    <required>false</required>
+    <required>true</required>
     <scale>0</scale>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>

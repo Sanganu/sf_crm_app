@@ -235,7 +235,15 @@ lwc-dev-server
 3. ONLY THEN deploy to real sandbox/production
 
 ```
+sf project retrieve start \
+  --metadata "Report" \
+  --target-org myOrg
 
+
+  # Retrieve a specific report by name
+sf project retrieve start \
+  --metadata "Report:unfiled$public/YourReportName" \
+  --target-org myOrg
 
 # Login via browser
 sf org login web --alias myOrg

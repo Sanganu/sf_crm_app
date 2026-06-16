@@ -33,7 +33,6 @@
             <value>
                 <fullName>Waitlisted</fullName>
                 <default>false</default>
-                <isActive>false</isActive>
                 <label>Waitlisted</label>
             </value>
         </valueSetDefinition>
