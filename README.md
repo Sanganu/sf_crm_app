@@ -83,16 +83,16 @@ that mirrors a real university Banner-to-Salesforce pipeline.
 ## Screenshots
 
 ### University Dashboard
-![App](screenshots/LightiningApp.png)
+![App](screenshots/UniversityDashboard.png)
 
-### Test Coverage
-![Tests](screenshots/allTestPass.png)
+### Enrollment Email Flow
+![Tests](screenshots/FlowActiveImage.png)
 
-### Course Service Test
-![Course](screenshots/courseServiceTest.png)
+### Deployment Log
+![Course](screenshots/Flow_Email.png)
 
 ### Deployment
-![Deploy](screenshots/start_deploy.png)
+![Deploy](screenshots/deploymentStatus.png)
 
 ---
 
