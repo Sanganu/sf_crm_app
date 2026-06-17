@@ -144,7 +144,7 @@ Enrollment Office</stringValue>
         <inputAssignments>
             <field>Operation__c</field>
             <value>
-                <stringValue>Outbound-Email</stringValue>
+                <stringValue>Email-Notification</stringValue>
             </value>
         </inputAssignments>
         <inputAssignments>
