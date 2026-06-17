@@ -76,7 +76,10 @@ private class CourseServiceTest {
             });
             System.assert(false,'Course code is missing');
         } catch (CourseService.CourseException e) {
-            System.assert(e.getMessage().contains('Course_code__c'));
+           System.assert(
+                e.getMessage().contains('Course Code'),
+                e.getMessage()
+            );
         }
     }
 
@@ -88,7 +91,10 @@ private class CourseServiceTest {
             });
             System.assert(false,'Course Name is missing');
         } catch (CourseService.CourseException e) {
-            System.assert(e.getMessage().contains('Code Name'));
+            System.assertEquals(
+                'Course Name is required',
+                e.getMessage()
+            );
         }
     }
 

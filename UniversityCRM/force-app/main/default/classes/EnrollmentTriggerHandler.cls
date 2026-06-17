@@ -109,7 +109,7 @@ public with sharing class EnrollmentTriggerHandler extends TriggerHandler {
         }
 
         if (!enrollStudent.isEmpty()) {
-            update as user enrollStudent.values();
+            update  enrollStudent.values();
         }
     }
 

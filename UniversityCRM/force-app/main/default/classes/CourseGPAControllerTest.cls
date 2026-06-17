@@ -10,13 +10,17 @@ private class CourseGPAControllerTest {
             Max_Capacity__c = 30
         );
         insert course;
-
-        Student__c student = new Student__c(GPA__c = 3.5);
-        insert student;
-
+        Student__c s = new Student__c(
+            Name__c = 'John',
+            Last_Name__c = 'Doe',
+            Email__c = 'john@test.com',
+            GPA__c = 3.5
+        );
+        insert s;
+      
         Enrollment__c enrollment = new Enrollment__c(
             Course__c = course.Id,
-            Student__c = student.Id,
+            Student__c = s.Id,
             Grade__c = 90,
             Status__c = 'Enrolled'
         );
@@ -54,7 +58,11 @@ private class CourseGPAControllerTest {
         );
         insert new List<Course__c>{ c1, c2 };
 
-        Student__c student = new Student__c(GPA__c = 3.5);
+        Student__c student = new Student__c(
+        Name__c='First@test.com',
+        Last_Name__c='Last@test.com',
+        Email__c='fLast@test.com',    
+        GPA__c = 3.5);
         insert student;
 
         insert new List<Enrollment__c>{
