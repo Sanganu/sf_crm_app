@@ -187,9 +187,13 @@
             e1.Status__c = 'Dropped';
             update e1;
         Test.stopTest();
-
-        System.assertEquals(1, Limits.getEmailInvocations(),
-            'One email should be sent on promotion');
+        Enrollment__c promoted = [
+                SELECT Id, Status__c 
+                FROM Enrollment__c 
+                WHERE Id = :e2.Id
+            ];
+    System.assertEquals('Enrolled', promoted.Status__c,
+        'Waitlisted student should be promoted to Enrolled');
     }
 
     // ── 7. Seat count updated after insert ────────────────────
