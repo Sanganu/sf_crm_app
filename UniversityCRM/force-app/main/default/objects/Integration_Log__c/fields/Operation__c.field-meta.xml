@@ -29,6 +29,21 @@
                 <default>false</default>
                 <label>Delete</label>
             </value>
+            <value>
+                <fullName>Email-Notification</fullName>
+                <default>false</default>
+                <label>Email-Notification</label>
+            </value>
+            <value>
+                <fullName>Outbound-Email</fullName>
+                <default>false</default>
+                <label>Outbound-Email</label>
+            </value>
+            <value>
+                <fullName>Notification</fullName>
+                <default>false</default>
+                <label>Notification</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

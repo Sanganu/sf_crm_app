@@ -35,7 +35,7 @@ sf apex run test --test-level RunLocalTests
 ```
 
 ```bash
-sf project retrieve start
+sf project retrieve start (this pulls everything - all defaults too)
 ```
 
 ```bash

@@ -41,6 +41,7 @@ Enrollment Office</stringValue>
             </value>
         </inputParameters>
         <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
     </actionCalls>
     <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
@@ -70,6 +71,7 @@ Enrollment Office</stringValue>
         </rules>
     </decisions>
     <description>Sends a confirmation email when an Enrollment status becomes Enrolled (on create or update). Logs failures and missing emails to Integration_Log__c.</description>
+    <environments>Default</environments>
     <interviewLabel>Enrollment Email Notification {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Enrollment Email Notification</label>
     <processMetadataValues>
@@ -111,7 +113,7 @@ Enrollment Office</stringValue>
         <inputAssignments>
             <field>Operation__c</field>
             <value>
-                <stringValue>Outbound-Email</stringValue>
+                <stringValue>Email-Notification</stringValue>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -166,5 +168,5 @@ Enrollment Office</stringValue>
         <recordTriggerType>CreateAndUpdate</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
     </start>
-    <status>Active</status>
+    <status>Draft</status>
 </Flow>
