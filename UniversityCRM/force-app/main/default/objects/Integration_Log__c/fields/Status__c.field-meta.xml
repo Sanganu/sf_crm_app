@@ -15,14 +15,14 @@
                 <label>Success</label>
             </value>
             <value>
-                <fullName>Failed</fullName>
+                <fullName>Fail</fullName>
                 <default>false</default>
-                <label>Failed</label>
+                <label>Fail</label>
             </value>
             <value>
-                <fullName>Skipped</fullName>
+                <fullName>Skip</fullName>
                 <default>false</default>
-                <label>Skipped</label>
+                <label>Skip</label>
             </value>
         </valueSetDefinition>
     </valueSet>
