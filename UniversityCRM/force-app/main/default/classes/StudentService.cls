@@ -3,7 +3,7 @@ public with sharing class StudentService {
     public class StudentException extends Exception{
     }
     private static final Decimal GPA_MIN = 0;
-    private static final Decimal GPS_MAX = 4;
+    private static final Decimal GPA_MAX = 4;
 
 
     public static void validateStudent(List<Student__c> students) {
@@ -15,7 +15,7 @@ public with sharing class StudentService {
                 throw new StudentException('Email is required');
             }
 
-            if (S.GPA__c != null && (S.GPA__c < GPA_MIN ||S.GPA__c > GPS_MAX)) {
+            if (S.GPA__c != null && (S.GPA__c < GPA_MIN ||S.GPA__c > GPA_MAX)) {
                 throw new StudentException('GPA must be between 0 and 4');
             }
 

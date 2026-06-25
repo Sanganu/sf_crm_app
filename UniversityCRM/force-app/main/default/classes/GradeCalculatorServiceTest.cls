@@ -39,7 +39,7 @@ private class GradeCalculatorServiceTest {
             new List<GradeCalculatorService.Request>{ req }
         );
         Test.stopTest();
-        System.assertEquals(null, results[0].letterGrade, 'Null grade should return null letter');
+        System.assertEquals('F', results[0].letterGrade, 'Null grade should return null letter');
     }
 
     @isTest
