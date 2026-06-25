@@ -24,15 +24,24 @@ const COLUMNS = [
 
 
 export default class CourseList extends LightningElement{
-    courses;
     error;
     isLoading = true;
     columns = COLUMNS;
-
-    _wiredCoursesResult;
+    
+    courses;
+    wiredCoursesResult;
 
     @wire(getCourses)
     wiredCourses(result){
-        
+        this.wiredCoursesResult =result;
+        const { data,error} = result;
+        if(data){
+            this.courses = data;
+        }else if(error){
+            this.courses = undefined;
+            console.error('Error loading courses',error);
+        }
     }
+
+    handle
 }
