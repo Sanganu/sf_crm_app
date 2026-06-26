@@ -12,6 +12,7 @@ export default class StudentList extends LightningElement {
         const { data, error } = result;
         if (data) {
             this.students = data;
+            this.error = undefined;
         } else if (error) {
             this.students = undefined;
             console.error('Error loading students', error);
