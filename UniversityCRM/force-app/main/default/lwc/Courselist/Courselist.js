@@ -1,9 +1,9 @@
 import {LightningElement,wire} from 'lwc';
 import {refreshApex} from '@salesforce/apex';
-import getCourses from '@salesforce/apex/CourseService.getCourses';
+import getCourses from '@salesforce/apex/CourseController.getCourses';
 
 const COLUMNS = [
-    {label:'Course Name',fieldName:'Course_Name__c',sortable:true},
+    {label:'Course Name',fieldName:'Name__c',sortable:true},
     {label:'Course Code',fieldName:'Code__c',sortable:true},
     {label:'Course End Date',fieldName:'Course_End_Date__c',sortable:false},
     {label:'Course Start Date',fieldName:'Course_Start_Date__c',sortable:true},

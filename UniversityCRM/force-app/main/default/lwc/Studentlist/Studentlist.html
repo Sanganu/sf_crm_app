@@ -4,11 +4,11 @@
 
         <template if:true={students}>
             <template for:each={students} for:item="student">
-                <c-student-card
+                <c-studentcard
                     key={student.Id}
                     student={student}
                     onenroll={handleEnroll}>
-                </c-student-card>
+                </c-studentcard>
             </template>
         </template>
 
