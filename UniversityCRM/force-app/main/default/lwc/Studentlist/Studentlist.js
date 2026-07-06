@@ -1,12 +1,16 @@
 import { LightningElement, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 import getStudents from '@salesforce/apex/StudentController.getStudents';
-// import ENROLL_STUDENT_CHANNEL from '@salesforce/messageChannel/EnrollStudent__c';
 import ENROLL_STUDENT_CHANNEL from '@salesforce/messageChannel/EnrollStudent__c';
+import { publish, MessageContext } from 'lightning/messageService';
 
 export default class StudentList extends LightningElement {
     students;
     wiredStudentsResult;
+    error;
+
+    @wire(MessageContext)
+    messageContext;
 
     @wire(getStudents)
     wiredStudents(result) {

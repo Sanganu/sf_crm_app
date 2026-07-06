@@ -77,18 +77,18 @@ export default class CourseList extends LightningElement{
         handleRetry(){
             this.isLoading = true;
             this.error = undefined;
-            refreshApex(this._wiredCoursesResult);
+            refreshApex(this. wiredCoursesResult);
         }
 
         handleRowAction(event){
             const actionName = event.detail.action.name;
             const row= event.detail.row;
-
+        
             if(actionName === 'enroll'){
                 this.dispatchEvent(
                     new CustomEvent('enrollcourse',{
                         detail:{courseId : row.Id,
-                            courseName:rowName
+                            courseName:row.Name
                         },
                         bubbles:true,
                         composed:false
@@ -103,4 +103,4 @@ export default class CourseList extends LightningElement{
                 );
             }
         }
-} 
+}
