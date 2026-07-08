@@ -27,6 +27,7 @@ export default class EnrollmentLiveFeed extends LightningElement {
 
     handleSubscribe() {
         const callback = (message) => {
+              console.log('🔥🔥🔥 EVENT RECEIVED:', JSON.stringify(message));
             const payload = message.data.payload;
             this.events = [
                 {
@@ -36,15 +37,18 @@ export default class EnrollmentLiveFeed extends LightningElement {
                     changeType: payload.Change_Type__c,
                     newStatus: payload.New_Status__c,
                     transactionId: payload.Transaction_Id__c,
-                    timestamp: new Date().toLocaleTimeString()
+                    timeStamp: new Date().toLocaleTimeString()
                 },
                 ...this.events
             ].slice(0, 10); // keep only the 10 most recent
         };
 
         subscribe(CHANNEL, -1, callback).then((response) => {
+            console.log('🔥🔥🔥 SUBSCRIBE SUCCESS:', JSON.stringify(response));
             this.subscription = response;
-        });
+        }).catch((err) => {
+              console.log('🔥🔥🔥 SUBSCRIBE FAILED:', JSON.stringify(err));
+        })
     }
 
     handleUnsubscribe() {
