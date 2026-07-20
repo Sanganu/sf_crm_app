@@ -48,6 +48,8 @@ public with sharing class EnrollmentTriggerHandler extends TriggerHandler {
             SELECT Id, Max_Capacity__c, Total_Students_Enrolled__c
             FROM Course__c
             WHERE Id IN :courseIds
+            WITH USER_MODE
+            FOR UPDATE
         ]);
         
         for (Enrollment__c e : recs) {
@@ -107,6 +109,7 @@ public with sharing class EnrollmentTriggerHandler extends TriggerHandler {
             WHERE Course__c IN :droppedCourseIds
             AND Status__c = 'Waitlisted'
             ORDER BY CreatedDate ASC
+            WITH USER_MODE
         ];
         
         Map<Id, Enrollment__c> enrollStudent = new Map<Id, Enrollment__c>();
@@ -141,7 +144,17 @@ public with sharing class EnrollmentTriggerHandler extends TriggerHandler {
                 ));
         }
         if (!events.isEmpty()) {
-            EventBus.publish(events);
+           List<Database.SaveResult> results = EventBus.publish(events);
+           for(Integer i=0;i<results.size();i++){
+            if(!results[i].isSuccess()){
+                for(Database.Error err: results[i].getErrors()){
+                    System.debug(LoggingLevel.Error,
+                'Platform Eent publish failed: '+err.getStatusCode()
+                +'-----' + err.getMessage()); 
+                //Need to add to Integration_Log
+                }
+            }
+           }
         }
     }
     
