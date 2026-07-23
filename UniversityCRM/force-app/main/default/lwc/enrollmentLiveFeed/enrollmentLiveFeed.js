@@ -4,11 +4,11 @@ import { subscribe, unsubscribe, onError } from 'lightning/empApi';
 const CHANNEL = '/event/Enrollment_Change__e';
 
 const COLUMNS = [
-    {label:'Change type',fieldName:'changeType', type:'text'},
-    {label:'New Status',fieldName:'newStatus', type:'text'},
-    {label:'Enrollment Id',fieldName:'enrollmentId', type:'text'},
-    {label:'Student Id',fieldName:'studentId', type:'text'},
-    {label:'Time',fieldName:'timeStamp', type:'text'},
+    { label: 'Change type', fieldName: 'changeType', type: 'text' },
+    { label: 'New Status', fieldName: 'newStatus', type: 'text' },
+    { label: 'Enrollment Id', fieldName: 'enrollmentId', type: 'text' },
+    { label: 'Student Id', fieldName: 'studentId', type: 'text' },
+    { label: 'Time', fieldName: 'timeStamp', type: 'text' },
 ]
 
 export default class EnrollmentLiveFeed extends LightningElement {
@@ -27,7 +27,7 @@ export default class EnrollmentLiveFeed extends LightningElement {
 
     handleSubscribe() {
         const callback = (message) => {
-              console.log('🔥🔥🔥 EVENT RECEIVED:', JSON.stringify(message));
+            console.log('--- EVENT RECEIVED: ---', JSON.stringify(message));
             const payload = message.data.payload;
             this.events = [
                 {
@@ -44,15 +44,19 @@ export default class EnrollmentLiveFeed extends LightningElement {
         };
 
         subscribe(CHANNEL, -1, callback).then((response) => {
-            console.log('🔥🔥🔥 SUBSCRIBE SUCCESS:', JSON.stringify(response));
+            console.log('--- SUBSCRIBE SUCCESS:', JSON.stringify(response));
             this.subscription = response;
         }).catch((err) => {
-              console.log('🔥🔥🔥 SUBSCRIBE FAILED:', JSON.stringify(err));
+            console.log('--- SUBSCRIBE FAILED:', JSON.stringify(err));
         })
     }
 
     handleUnsubscribe() {
-        unsubscribe(this.subscription);
+        if (this.subscription) {
+            unsubscribe(this.subscription, () => {
+                this.subscription = null;
+            });
+        }
     }
 
     registerErrorListener() {

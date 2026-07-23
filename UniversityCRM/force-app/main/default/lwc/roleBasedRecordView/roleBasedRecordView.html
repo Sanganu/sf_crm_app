@@ -1,0 +1,23 @@
+<template>
+    <lightning-card title="Contact Details">
+
+        <template lwc:if={isDean}>
+            <lightning-record-view-form record-id={recordId} object-api-name="Contact">
+                <lightning-output-field field-name="Name"></lightning-output-field>
+                <lightning-output-field field-name="Title"></lightning-output-field>
+                <lightning-output-field field-name="Email"></lightning-output-field>
+                <lightning-output-field field-name="Phone"></lightning-output-field>
+                <lightning-output-field field-name="AccountId"></lightning-output-field>
+            </lightning-record-view-form>
+        </template>
+
+        <template lwc:if={isStudent}>
+            <lightning-record-view-form record-id={recordId} object-api-name="Contact">
+                <lightning-output-field field-name="Name"></lightning-output-field>
+                <lightning-input-field field-name="Phone"></lightning-input-field>
+                <lightning-input-field field-name="Email"></lightning-input-field>
+            </lightning-record-view-form>
+        </template>
+
+    </lightning-card>
+</template>
