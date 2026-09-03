@@ -1,0 +1,5 @@
+studentExternalId,firstName,lastName,email,phone,dateOfBirth,department,status,gpa,totalCredits,programStartDate,expectedGraduationDate
+STU301,Arun,Kumar,arun.kumar@test.com,9876543210,2000-06-15,Computer Science,Active,3.5,60,2022-09-01,2026-05-15
+STU302,Priya,Sharma,priya.sharma@test.com,9876543211,2001-03-22,Mathematics,Active,3.8,45,2023-01-01,2027-05-15
+STU303,Raj,Patel,raj.patel@test.com,9876543212,1999-11-10,Environment Science,Active,2.9,90,2021-09-01,2025-05-15
+STU304,,Broken,missing.email,9876543213,2002-01-01,Computer Science,Active,5.9,10,2024-09-01,2028-05-15

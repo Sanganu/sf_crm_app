@@ -1,0 +1,6 @@
+sf:
+  auth.host: "login.salesforce.com"
+  api.host:  "<Devorg URL>"
+  api.version: "v60.0"
+http:
+  listener.port: "8081"
