@@ -94,7 +94,7 @@ output application/json
 ---
 {
     allOrNone: false,
-    records: vars.currentChunk map ($.record)
+    records: vars.currentChunk map ((c) -> { attributes: { 'type': "Student__c" } } ++ c.record)
 }]]>
                         </ee:set-payload>
                     </ee:message>
