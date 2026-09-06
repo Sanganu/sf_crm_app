@@ -5,27 +5,29 @@ public class GradeCalculatorService{
         @InvocableVariable(required = true)
         public Id enrollmentId;
     }
-     public class Response{
+
+    public class Response{
         @InvocableVariable
         public String letterGrade;
         @InvocableVariable
         public Id enrollmentId;
     }
+
     @InvocableMethod(
-        label='Calculate Letter Grade'
+    label='Calculate Letter Grade'
         description='Converts numeric grade to letter grade'
         category='Enrollment'
-    )
+        )
     public static List<Response> calculateLetterGrade(List<Request> requests){
-        List<Response> responses = new Response();
+        List<Response> responses = new List<Response>();
         for (Request req : requests){
             Response res = new Response();
             res.enrollmentId = req.enrollmentId;
             res.letterGrade = req.grade >= 90 ? 'A'
-            : req.grade >= 80 ? 'B'
-            : req.grade >= 70 ? 'C' : 'F';
-            responses.add(res)
-        } 
-        return responses;  
+                : req.grade >= 80 ? 'B'
+                : req.grade >= 70 ? 'C' : 'F';
+            responses.add(res);
+        }
+        return responses;
     }
 }

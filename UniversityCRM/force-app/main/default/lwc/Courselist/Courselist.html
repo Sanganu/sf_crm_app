@@ -1,0 +1,36 @@
+<template>
+    <lightning-card title="Courses" icon-name="standard:education">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading courses" size="medium">
+
+            </lightning-spinner>
+        </template>
+        <template if:true={error}>
+            <div class="slds-notify slds-notify_alert slds-alert_error slds-m-around_medium">
+                <span class="slds-assistive-text">Error</span>
+                <p>{error}</p>
+                <lightning-button label="Retry" variant="neutral" onclick={handleRetry} class="slds-m-top_small">
+                </lightning-button>
+            </div>
+        </template>
+        <template if:true={isEmpty}>
+            <div class="slds-illustration slds-illustration_small slds-p-around_medium">
+                <p class="slds-text-color_weak">No courses found.</p>
+            </div>
+        </template>
+        <template if:true={hasCourses}>
+            <div class="slds-p-around_small">
+                <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                    {enrolledCount} of {courses.length} courses have enrollments
+                </p>
+                <lightning-datatable
+                key-field="Id"
+                 data={courses}
+                 columns={columns}
+                 onrowaction={handleRowAction}
+                 hide-checkbox-column>
+                </lightning-datatable>
+            </div>
+        </template>
+    </lightning-card>
+</template>

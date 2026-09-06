@@ -1,0 +1,19 @@
+<template>
+    <lightning-card title="Students" icon-name="standard:contact">
+        <lightning-button slot="actions" label="Refresh" onclick={handleRefresh}></lightning-button>
+
+        <template if:true={students}>
+            <template for:each={students} for:item="student">
+                <c-studentcard
+                    key={student.Id}
+                    student={student}
+                    onenroll={handleEnroll}>
+                </c-studentcard>
+            </template>
+        </template>
+
+        <template if:false={students}>
+            <p class="slds-p-around_medium">Loading students...</p>
+        </template>
+    </lightning-card>
+</template>

@@ -1,19 +1,19 @@
 public with sharing class EnrollmentService {
-
+    
     public class EnrollmentException extends Exception {}
-
-
+    
+    
     public static void validateEnrollments(List<Enrollment__c> enrollments) {
-
+        
         if(enrollments == null || enrollments.isEmpty()) return;
-
+        
         for (Enrollment__c e : enrollments) {
             if (e.Student__c == null) throw new EnrollmentException('Student is required');
             if (e.Course__c  == null) throw new EnrollmentException('Course is required');
         }
     }
-
-    //Duplicates 
+    
+    //Duplicates
     private static void rejectDuplicates(List<Enrollment__c> incoming) {
         Set<Id> studentIds = new Set<Id>();
         Set<Id> courseIds  = new Set<Id>();
@@ -33,10 +33,10 @@ public with sharing class EnrollmentService {
         for (Enrollment__c e : incoming) {
             if (existing.containsKey(e.Student__c + '|' + e.Course__c)) {
                 throw new EnrollmentException('Student already enrolled in this course');
-            }   
+            }
         }
     }
-
+    
     @AuraEnabled
     public static List<Id> enrollStudents(List<Id> studentIds, Id courseId) {
         if (studentIds == null || studentIds.isEmpty() || courseId == null) {
@@ -46,16 +46,16 @@ public with sharing class EnrollmentService {
         for (Id sid : studentIds) {
             toInsert.add(new Enrollment__c(
                 Student__c = sid,
-                Course__c  = courseId,
-                Status__c  = 'Enrolled'
-            ));
+            Course__c  = courseId,
+            Status__c  = 'Enrolled'
+                ));
         }
         validateEnrollments(toInsert);
         rejectDuplicates(toInsert);
         insert as user toInsert;
         return new List<Id>(new Map<Id, Enrollment__c>(toInsert).keySet());
     }
-
+    
     @AuraEnabled(cacheable=true)
     public static List<Enrollment__c> getEnrollments() {
         return [
@@ -69,4 +69,15 @@ public with sharing class EnrollmentService {
         ];
     }
 
+    @AuraEnabled(cacheable=true)
+    public static List<Enrollment__c> getEnrollmentsByStudent(Id studentId) {
+        if (studentId == null) return new List<Enrollment__c>();
+        return [
+        SELECT Id, Student__r.Name, Course__r.Name, Status__c
+        FROM Enrollment__c
+        WHERE Student__c = :studentId
+        ORDER BY CreatedDate DESC
+    ];
+    }
+    
 }

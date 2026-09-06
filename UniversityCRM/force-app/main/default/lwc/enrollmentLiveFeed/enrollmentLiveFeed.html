@@ -1,0 +1,9 @@
+<template>
+    <lightning-card title="Live Enrollment Changes" icon-name="standard:events">
+        <lightning-datatable key-field="id" data={events} columns={columns} hide-checkbox-column>
+        </lightning-datatable>
+        <template if:false={events.length}>
+            <p class="slds-p-around_medium slds-text-color_weak">Waiting for enrollment changes…</p>
+        </template>
+    </lightning-card>
+</template>

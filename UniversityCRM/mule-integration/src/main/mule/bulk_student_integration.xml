@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <configuration-properties file="config.properties"/>
+    <http:request-config name="SF_Auth_Config">
+        <http:request-connection host="orgfarm-f62760ebb6-dev-ed.develop.my.salesforce.com"
+            port="443" protocol="HTTPS"/>
+    </http:request-config>
+    <http:request-config name="SF_API_Config">
+        <http:request-connection host="orgfarm-f62760ebb6-dev-ed.develop.my.salesforce.com"
+            port="443" protocol="HTTPS"/>
+    </http:request-config>
+    <flow name="work_flow_Stu_Enro_CourFlow">
+        <!--  Receive request -->
+        <http:listener
+            config-ref="HTTP_Listener_Config"
+            path="/upsert-student"
+            doc:name="Listener"/>
+        <set-variable
+            variableName="studentPayload"
+            value="#[payload]"
+            mimeType="application/json"
+            doc:name="Store Original Payload"/>
+        <logger level="INFO"
+            message="#['Received ' ++ (sizeOf(payload) as String) ++ ' student records']"
+            doc:name="Log Request"/>
+        <!--  Get Salesforce access token (once, reused for all chunks) -->
+        <http:request method="POST"
+            config-ref="SF_Auth_Config"
+            path="/services/oauth2/token"
+            doc:name="Get SF Token">
+            <http:body>
+                <![CDATA[grant_type=client_credentials&client_id=${sf.ConsumerKey}&client_secret=${sf.ConsumerSecret}]]>
+            </http:body>
+            <http:headers>
+                <![CDATA[#[{"Content-Type": "application/x-www-form-urlencoded"}]]]>
+            </http:headers>
+        </http:request>
+        <set-variable
+            variableName="accessToken"
+            value="#[payload.access_token]"
+            doc:name="Store Access Token"/>
+        <!--  Build the list of {externalId, record} pairs, then split into chunks of 200 -->
+        <ee:transform doc:name="Build Chunked SF Records">
+            <ee:variables>
+                <ee:set-variable variableName="chunks">
+                    <![CDATA[%dw 2.0
+import * from dw::core::Arrays
+output application/java
+var combined = vars.studentPayload map (student) -> {
+    externalId: student.studentExternalId,
+    record: {
+        Name__c:                     student.firstName,
+        Last_Name__c:                student.lastName,
+        Email__c:                    student.email,
+        Phone__c:                    student.phone,
+        Date_of_Birth__c:            student.dateOfBirth,
+        Department__c:               student.department,
+        Status__c:                   student.status default "Active",
+        GPA__c:                      student.gpa,
+        Total_credits__c:            student.totalCredits default 0,
+        Program_Start_Date__c:       student.programStartDate,
+        Expected_Graduation_Date__c: student.expectedGraduationDate,
+        Student_External_Id__c:      student.studentExternalId
+    }
+}
+---
+combined divideBy 200]]>
+                </ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <!--  Initialize variables  for results and log records -->
+        <set-variable variableName="resultsList" value="#[[]]" doc:name="Init Results List"/>
+        <set-variable variableName="logRecords" value="#[[]]" doc:name="Init Log Records"/>
+        <!--  For each chunk of up to 200 students, do ONE bulk upsert call -->
+        <foreach collection="#[vars.chunks]" doc:name="For Each Chunk of 200">
+            <set-variable
+                variableName="currentChunk"
+                value="#[payload]"
+                doc:name="Store Current Chunk"/>
+            <try doc:name="Try Bulk Upsert Chunk">
+                <ee:transform doc:name="Build Composite Upsert Body">
+                    <ee:message>
+                        <ee:set-payload>
+                            <![CDATA[%dw 2.0
+output application/json
+---
+{
+    allOrNone: false,
+    records: vars.currentChunk map ((c) -> { attributes: { 'type': "Student__c" } } ++ c.record)
+}]]>
+                        </ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <http:request method="PATCH"
+                    config-ref="SF_API_Config"
+                    path="/services/data/v60.0/composite/sobjects/Student__c/Student_External_Id__c"
+                    doc:name="Bulk Upsert Students">
+                    <http:body>#[payload]</http:body>
+                    <http:headers>
+                        <![CDATA[#[{
+                        "Authorization": "Bearer " ++ vars.accessToken,
+                        "Content-Type": "application/json"
+                    }]]]>
+                    </http:headers>
+                    <http:response-validator>
+                        <http:success-status-code-validator values="200,201,204"/>
+                    </http:response-validator>
+                </http:request>
+                <logger level="INFO"
+                    message="#['Chunk upsert response: ' ++ write(payload, 'application/json')]"
+                    doc:name="Log Chunk Response"/>
+                <!-- Zip the response (one entry per record, same order) back with externalId -->
+                <ee:transform doc:name="Accumulate Results and Log Records">
+                    <ee:variables>
+                        <ee:set-variable variableName="resultsList">
+                            <![CDATA[%dw 2.0
+output application/java
+var zipped = payload map ((res, idx) -> {
+    externalId: vars.currentChunk[idx].externalId,
+    success: res.success,
+    errors: res.errors default []
+})
+---
+vars.resultsList ++ (zipped map (z) -> {
+    externalId: z.externalId,
+    success: z.success,
+    error: if (z.success) null else write(z.errors, "application/json")
+})]]>
+                        </ee:set-variable>
+                        <ee:set-variable variableName="logRecords">
+                            <![CDATA[%dw 2.0
+output application/java
+var zipped = payload map ((res, idx) -> {
+    externalId: vars.currentChunk[idx].externalId,
+    success: res.success,
+    errors: res.errors default []
+})
+---
+vars.logRecords ++ (zipped map (z) -> {
+    attributes: { 'type': "Integration_Log__c" },
+    External_Id__c:    z.externalId,
+    Status__c:          if (z.success) "Success" else "Fail",
+    Error_Message__c:   if (z.success) null else write(z.errors, "application/json"),
+    Object_Type__c:      "Student__c",
+    Operation__c:         "Upsert",
+    Source_System__c:     "Postman",
+    Timestamp__c:          now()
+})]]>
+                        </ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+                <!-- If the ENTIRE chunk request fails (e.g. auth expired), mark all records in it as failed -->
+                <error-handler>
+                    <on-error-continue type="ANY" doc:name="On Chunk-Level Error">
+                        <logger level="ERROR"
+                            message="#['Entire chunk failed: ' ++ (error.description default 'unknown error')]"
+                            doc:name="Log Chunk Failure"/>
+                        <ee:transform doc:name="Mark Whole Chunk As Failed">
+                            <ee:variables>
+                                <ee:set-variable variableName="resultsList">
+                                    <![CDATA[%dw 2.0
+output application/java
+var errMsg = error.description default "Chunk request failed"
+---
+vars.resultsList ++ (vars.currentChunk map (c) -> {
+    externalId: c.externalId,
+    success: false,
+    error: errMsg
+})]]>
+                                </ee:set-variable>
+                                <ee:set-variable variableName="logRecords">
+                                    <![CDATA[%dw 2.0
+output application/java
+var errMsg = error.description default "Chunk request failed"
+---
+vars.logRecords ++ (vars.currentChunk map (c) -> {
+    attributes: { 'type': "Integration_Log__c" },
+    External_Id__c:    c.externalId,
+    Status__c:          "Fail",
+    Error_Message__c:   errMsg,
+    Object_Type__c:      "Student__c",
+    Operation__c:         "Upsert",
+    Source_System__c:     "Postman",
+    Timestamp__c:          now()
+})]]>
+                                </ee:set-variable>
+                            </ee:variables>
+                        </ee:transform>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </foreach>
+        <logger level="INFO"
+            message="#['All chunks processed. Total results: ' ++ (sizeOf(vars.resultsList) as String)]"
+            doc:name="Log All Chunks Done"/>
+        <!-- : Bulk-write the Integration Log records, also in chunks of 200 -->
+        <ee:transform doc:name="Build Log Chunks">
+            <ee:variables>
+                <ee:set-variable variableName="logChunks">
+                    <![CDATA[%dw 2.0
+import * from dw::core::Arrays
+output application/java
+---
+vars.logRecords divideBy 200]]>
+                </ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <foreach collection="#[vars.logChunks]" doc:name="For Each Log Chunk">
+            <try doc:name="Try Bulk Log Insert">
+                <ee:transform doc:name="Build Composite Insert Body">
+                    <ee:message>
+                        <ee:set-payload>
+                            <![CDATA[%dw 2.0
+output application/json
+---
+{
+    allOrNone: false,
+    records: payload
+}]]>
+                        </ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <http:request method="POST"
+                    config-ref="SF_API_Config"
+                    path="/services/data/v60.0/composite/sobjects"
+                    doc:name="Bulk Insert Integration Logs">
+                    <http:body>#[payload]</http:body>
+                    <http:headers>
+                        <![CDATA[#[{
+                        "Authorization": "Bearer " ++ vars.accessToken,
+                        "Content-Type": "application/json"
+                    }]]]>
+                    </http:headers>
+                    <http:response-validator>
+                        <http:success-status-code-validator values="200,201,204"/>
+                    </http:response-validator>
+                </http:request>
+                <logger level="INFO"
+                    message="#['Log chunk inserted: ' ++ write(payload, 'application/json')]"
+                    doc:name="Log Insert Success"/>
+                <error-handler>
+                    <on-error-continue type="ANY" doc:name="On Log Chunk Error">
+                        <!-- If logging itself fails, we just console-log it - we do NOT try to
+                             write a log about the log write failing, to avoid infinite recursion -->
+                        <logger level="ERROR"
+                            message="#['Bulk log insert failed for a chunk: ' ++ (error.description default 'unknown error')]"
+                            doc:name="Log Insert Failure"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </foreach>
+        <!--  Return honest, per-record summary to caller -->
+        <ee:transform doc:name="Build Final Response">
+            <ee:message>
+                <ee:set-payload>
+                    <![CDATA[%dw 2.0
+output application/json
+var results = vars.resultsList
+---
+{
+    totalProcessed: sizeOf(results),
+    succeeded: sizeOf(results filter ($.success == true)),
+    failed: sizeOf(results filter ($.success == false)),
+    details: results
+}]]>
+                </ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

@@ -30,6 +30,31 @@
                 <default>false</default>
                 <label>Mathematics</label>
             </value>
+            <value>
+                <fullName>Environmental Science</fullName>
+                <default>false</default>
+                <label>Environmental Science</label>
+            </value>
+            <value>
+                <fullName>Natural Science</fullName>
+                <default>false</default>
+                <label>Natural Science</label>
+            </value>
+            <value>
+                <fullName>Cryptocurrency</fullName>
+                <default>false</default>
+                <label>Cryptocurrency</label>
+            </value>
+            <value>
+                <fullName>Pharma</fullName>
+                <default>false</default>
+                <label>Pharma</label>
+            </value>
+            <value>
+                <fullName>Bio-Tech</fullName>
+                <default>false</default>
+                <label>Bio-Tech</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>
