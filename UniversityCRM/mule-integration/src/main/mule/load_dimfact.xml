@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<db:config name="DW_Config" doc:name="Database Config" doc:id="1ab845e0-d411-4756-b522-c05ccf72e83b" >
+		<db:generic-connection url="jdbc:postgresql://127.0.0.1:54322/postgres" driverClassName="org.postgresql.Driver" user="postgres" password="postgres" />
+	</db:config>
+	<flow name="load_dimfactFlow" doc:id="a0dafd0d-b08d-490b-86bb-d56286ea2d3c" >
+		<scheduler doc:name="Scheduler" doc:id="b20fa063-2127-442c-a0e8-facb193d1ef8" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="5" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</scheduler>
+		<db:select doc:name="Query Dim and Fact tables" doc:id="7f0c48ef-7dbb-4924-9b90-984392f6437b" config-ref="DW_Config">
+			<db:sql ><![CDATA[SELECT
+    f.enrollment_key    AS enrollmentKey,
+    ds.student_external_id AS studentExternalId,
+    dc.course_external_id  AS courseExternalId,
+    f.enrollment_date   AS enrollmentDate,
+    f.status            AS status
+FROM fact_enrollment f
+JOIN dim_student ds ON f.student_key = ds.student_key
+JOIN dim_course dc ON f.course_key = dc.course_key
+WHERE f.sync_status IS NULL OR f.sync_status = 'PENDING']]></db:sql>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="f14cd1b5-fd55-4afd-aad8-9b399263fe2f" message="#[payload]"/>
+	</flow>
+</mule>

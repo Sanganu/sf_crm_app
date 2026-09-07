@@ -52,3 +52,9 @@ Running `sf project deploy start` or `sf project retrieve start` with **no `--so
 | 9 | `git revert <commit-hash>` | Creates a new commit that undoes a previous one — safe for commits already pushed/shared. |
 | 10 | `git log --oneline` | Quick commit history view, useful for finding a hash to reset or revert to. |
 | 11 | `git branch -d <branch-name>` | Deletes a local branch that's already merged, for cleanup. |
+
+
+
+Mulesoft - Supabase:
+
+mvn clean install -DskipTests  
