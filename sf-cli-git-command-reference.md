@@ -39,12 +39,7 @@ Running `sf project deploy start` or `sf project retrieve start` with **no `--so
 | 22 | `sf project retrieve start --metadata "CustomObject:Integration_Log__c"` | Object only | Retrieves a single custom object's metadata. |
 | 23 | `sf project retrieve start --metadata "Report:unfiled$public/YourReportName"` | Report only | Retrieves one specific report by its folder/name path. |
 | 24 | `sf force lightning dev` | LWC local preview | Runs a local dev server to preview a Lightning Web Component in the browser without deploying it to the org. |
-
-**Output format flag** (appends to any `sf apex run test` command): `--result-format human` (default, readable) · `--result-format json` (for scripts/CI) · `--result-format junit` (for Jenkins-style tooling).
-
-## Git — Cleanup & Reverting
-
-| # | Command | Purpose |
+| 25 | `sf project retrieve start --source-dir force-app/main/defau git
 |---|---------|---------|
 | 1 | `git status` | Shows staged, unstaged, and untracked files — always check this before any cleanup action. |
 | 2 | `git diff` | Shows the exact line-by-line changes not yet staged. |
@@ -57,3 +52,9 @@ Running `sf project deploy start` or `sf project retrieve start` with **no `--so
 | 9 | `git revert <commit-hash>` | Creates a new commit that undoes a previous one — safe for commits already pushed/shared. |
 | 10 | `git log --oneline` | Quick commit history view, useful for finding a hash to reset or revert to. |
 | 11 | `git branch -d <branch-name>` | Deletes a local branch that's already merged, for cleanup. |
+
+
+
+Mulesoft - Supabase:
+
+mvn clean install -DskipTests  

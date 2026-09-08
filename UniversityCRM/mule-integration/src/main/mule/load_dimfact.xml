@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<db:config name="DW_Config" doc:name="Database Config" doc:id="1ab845e0-d411-4756-b522-c05ccf72e83b" >
+		<db:generic-connection url="jdbc:postgresql://127.0.0.1:54322/postgres" driverClassName="org.postgresql.Driver" user="postgres" password="postgres" />
+	</db:config>
+	<flow name="load_dimfactFlow" doc:id="a0dafd0d-b08d-490b-86bb-d56286ea2d3c" >
+		<scheduler doc:name="Scheduler" doc:id="b20fa063-2127-442c-a0e8-facb193d1ef8" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="5" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</scheduler>
+		<db:select doc:name="Query Dim and Fact tables" doc:id="7f0c48ef-7dbb-4924-9b90-984392f6437b" config-ref="DW_Config">
+			<db:sql ><![CDATA[SELECT
+    f.enrollment_key    AS enrollmentKey,
+    ds.student_external_id AS studentExternalId,
+    dc.course_external_id  AS courseExternalId,
+    f.enrollment_date   AS enrollmentDate,
+    f.status            AS status
+FROM fact_enrollment f
+JOIN dim_student ds ON f.student_key = ds.student_key
+JOIN dim_course dc ON f.course_key = dc.course_key
+WHERE f.sync_status IS NULL OR f.sync_status = 'PENDING']]></db:sql>
+		</db:select>
+		<set-variable value="#[payload]" doc:name="Store enrollment rows" doc:id="e46bbbb4-8fb5-48ca-8464-9f10dd3f521c" variableName="enrollmentRows"/>
+		<http:request doc:name="Get SF Token" doc:id="4e02c531-ba4b-4062-8f20-3d6036285d3d" config-ref="SF_Auth_Config" method="POST" path="/services/oauth2/token">
+			<http:body ><![CDATA[grant_type=client_credentials&client_id=${sf.ConsumerKey}&client_secret=${sf.ConsumerSecret}]]></http:body>
+			<http:headers ><![CDATA[#[{"Content-Type":"application/x-www-form-urlencoded"}]]]></http:headers>
+		</http:request>
+		<set-variable value="#[payload.access_token]" doc:name="Store access token" doc:id="e69978c0-f983-4725-8aed-499c346840b2" variableName="accessToken"/>
+		<ee:transform doc:name="Transform Message" doc:id="f127b87d-8b52-4338-be22-6dab282ab309" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import divideBy from dw::core::Arrays
+output application/java
+var combined = vars.enrollmentRows map(row) -> {
+	externalId:row.enrollmentkey as String,
+	record:{
+		Enrollment_External_Id__c: row.enrollmentkey as String,
+		"Student__r":{Student_External_Id__c: row.studentexternalid},
+		"Course__r":{Course_External_Id__c: row.courseexternalid},
+		Enrollment_Date__c: row.enrollmentdate,
+		Status__c: row.status default "Enrolled"
+		}
+}
+---
+combined divideBy 200]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<foreach doc:name="For Each Chunk of 200" doc:id="ae9085c6-4093-4922-8590-8b792d584049" collection="#[payload]">
+			<try doc:name="Try Bulk Upsert Chunk" doc:id="3e905cd8-24d4-4baf-aada-05a878715197" >
+				<until-successful maxRetries="3" doc:name="Retry Enrollment Upsert" doc:id="8e6e2907-5ed5-48d7-9dda-21abb6d3603f" millisBetweenRetries="2000">
+					<ee:transform doc:name="Transform Message" doc:id="a1e60ccf-9e7f-442d-91c7-f54fd5b4ba65" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	allOrNone:false,
+	records:payload map ($.record)
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<http:request doc:name="Upsert Enrollment records" doc:id="9b052cb2-e5e8-41cd-b5bd-49aad9fcaa00" config-ref="SF_API_Config" method="PATCH" path="/services/data/v60.0/composite/sobjects/Enrollment__c/Enrollment_External_Id__c">
+						<http:headers ><![CDATA[#[{"Authorization": "Bearer " ++ vars.accessToken, "Content-Type": "application/json"}]]]></http:headers>
+					</http:request>
+				</until-successful>
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On chunk level error" doc:id="963599d5-acd7-4cdc-819c-432a0740ea8b" >
+						<logger level="ERROR" doc:name="Log Chunk Errors" doc:id="cd459c7c-ffb7-447f-bf22-2659232e3449" message="#['Chunk upsert failed after retries: ' ++ (error.description default 'unknown error')]"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</foreach>
+		<logger level="INFO" doc:name="Logger" doc:id="f14cd1b5-fd55-4afd-aad8-9b399263fe2f" message="#[payload]"/>
+	</flow>
+</mule>
