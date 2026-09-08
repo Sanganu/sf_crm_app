@@ -85,8 +85,9 @@ combined divideBy 200]]>
                 variableName="currentChunk"
                 value="#[payload]"
                 doc:name="Store Current Chunk"/>
-            <try doc:name="Try Bulk Upsert Chunk">
-                <ee:transform doc:name="Build Composite Upsert Body">
+			<try doc:name="Try Bulk Upsert Chunk">
+                <until-successful maxRetries="3" doc:name="Retry Bulk Insert" doc:id="74c3b2e1-75b0-4676-91b6-d6241cbe01ea" millisBetweenRetries="2000">
+					<ee:transform doc:name="Build Composite Upsert Body">
                     <ee:message>
                         <ee:set-payload>
                             <![CDATA[%dw 2.0
@@ -99,10 +100,7 @@ output application/json
                         </ee:set-payload>
                     </ee:message>
                 </ee:transform>
-                <http:request method="PATCH"
-                    config-ref="SF_API_Config"
-                    path="/services/data/v60.0/composite/sobjects/Student__c/Student_External_Id__c"
-                    doc:name="Bulk Upsert Students">
+					<http:request method="PATCH" config-ref="SF_API_Config" path="/services/data/v60.0/composite/sobjects/Student__c/Student_External_Id__c" doc:name="Bulk Upsert Students">
                     <http:body>#[payload]</http:body>
                     <http:headers>
                         <![CDATA[#[{
@@ -111,9 +109,10 @@ output application/json
                     }]]]>
                     </http:headers>
                     <http:response-validator>
-                        <http:success-status-code-validator values="200,201,204"/>
+                        <http:success-status-code-validator values="200,201,204" />
                     </http:response-validator>
                 </http:request>
+				</until-successful>
                 <logger level="INFO"
                     message="#['Chunk upsert response: ' ++ write(payload, 'application/json')]"
                     doc:name="Log Chunk Response"/>
@@ -215,7 +214,8 @@ vars.logRecords divideBy 200]]>
         </ee:transform>
         <foreach collection="#[vars.logChunks]" doc:name="For Each Log Chunk">
             <try doc:name="Try Bulk Log Insert">
-                <ee:transform doc:name="Build Composite Insert Body">
+                <until-successful maxRetries="3" doc:name="Retry Bulk Log Insert" doc:id="684687f1-a90f-4ce2-9c22-0ba1c00a1440" millisBetweenRetries="3000">
+					<ee:transform doc:name="Build Composite Insert Body">
                     <ee:message>
                         <ee:set-payload>
                             <![CDATA[%dw 2.0
@@ -228,10 +228,7 @@ output application/json
                         </ee:set-payload>
                     </ee:message>
                 </ee:transform>
-                <http:request method="POST"
-                    config-ref="SF_API_Config"
-                    path="/services/data/v60.0/composite/sobjects"
-                    doc:name="Bulk Insert Integration Logs">
+					<http:request method="POST" config-ref="SF_API_Config" path="/services/data/v60.0/composite/sobjects" doc:name="Bulk Insert Integration Logs">
                     <http:body>#[payload]</http:body>
                     <http:headers>
                         <![CDATA[#[{
@@ -240,9 +237,10 @@ output application/json
                     }]]]>
                     </http:headers>
                     <http:response-validator>
-                        <http:success-status-code-validator values="200,201,204"/>
+                        <http:success-status-code-validator values="200,201,204" />
                     </http:response-validator>
                 </http:request>
+				</until-successful>
                 <logger level="INFO"
                     message="#['Log chunk inserted: ' ++ write(payload, 'application/json')]"
                     doc:name="Log Insert Success"/>
@@ -258,7 +256,7 @@ output application/json
             </try>
         </foreach>
         <!--  Return honest, per-record summary to caller -->
-        <ee:transform doc:name="Build Final Response">
+		<ee:transform doc:name="Build Final Response">
             <ee:message>
                 <ee:set-payload>
                     <![CDATA[%dw 2.0
