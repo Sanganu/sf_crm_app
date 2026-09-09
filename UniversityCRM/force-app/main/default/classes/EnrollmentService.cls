@@ -39,21 +39,32 @@ public with sharing class EnrollmentService {
     
     @AuraEnabled
     public static List<Id> enrollStudents(List<Id> studentIds, Id courseId) {
-        if (studentIds == null || studentIds.isEmpty() || courseId == null) {
-            throw new EnrollmentException('studentIds and courseId are required');
+        try{
+            if (studentIds == null || studentIds.isEmpty() || courseId == null) {
+                throw new EnrollmentException('studentIds and courseId are required');
+            }
+            List<Enrollment__c> toInsert = new List<Enrollment__c>();
+            for (Id sid : studentIds) {
+                toInsert.add(new Enrollment__c(
+                    Student__c = sid,
+                Course__c  = courseId,
+                Status__c  = 'Enrolled'
+                    ));
+            }
+            validateEnrollments(toInsert);
+            rejectDuplicates(toInsert);
+            insert as user toInsert;
+            return new List<Id>(new Map<Id, Enrollment__c>(toInsert).keySet());
+        }catch(EnrollmentException e){
+            AuraHandledException ex =  new AuraHandledException(e.getMessage());
+            ex.setMessage(e.getMessage());
+            throw ex;
+        }catch(DmlException e){
+            System.debug(LoggingLevel.Error,'DML failure on enrolling students: '+e.getMessage());
+            AuraHandledException ex = new AuraHandledException('Unable to save student enrollment. Please try again later');
+            ex.setMessage('Unable to save student enrollment. Please try again later');
+            throw ex;
         }
-        List<Enrollment__c> toInsert = new List<Enrollment__c>();
-        for (Id sid : studentIds) {
-            toInsert.add(new Enrollment__c(
-                Student__c = sid,
-            Course__c  = courseId,
-            Status__c  = 'Enrolled'
-                ));
-        }
-        validateEnrollments(toInsert);
-        rejectDuplicates(toInsert);
-        insert as user toInsert;
-        return new List<Id>(new Map<Id, Enrollment__c>(toInsert).keySet());
     }
     
     @AuraEnabled(cacheable=true)
@@ -68,7 +79,7 @@ public with sharing class EnrollmentService {
             LIMIT 200
         ];
     }
-
+    
     @AuraEnabled(cacheable=true)
     public static List<Enrollment__c> getEnrollmentsByStudent(Id studentId) {
         if (studentId == null) return new List<Enrollment__c>();

@@ -38,14 +38,30 @@ public with sharing class StudentService {
     }
 
   
+//    public static string methodName(){
+//     try {
+        
+//     } catch (Exception e) {
+//         throw new AuraHandledException(e.getMessage());
+//     }
+//    }
+
+    @AuraEnabled
     public static Id createStudent(Student__c s){
         try {
             validateStudent(new List<Student__c> { s });
             insert as user s;
             return s.Id;
             
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
+        } catch (StudentException e) {
+            AuraHandledException ex = new AuraHandledException(e.getMessage());
+            ex.setMessage(e.getMessage());
+            throw ex;
+        } catch (DmlException e){
+            System.debug(LoggingLevel.Error,'createStudent - DML failed with error: '+e.getMessage());
+            AuraHandledException ex = new AuraHandledException('Could not save student. Please try again.');
+            ex.setMessage('Could not save student. Please retry');
+            throw ex;
         }
     }
 }
